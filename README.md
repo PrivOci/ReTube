@@ -22,7 +22,7 @@ I chose them because they are very simple and easy-to-use.
 `venv\Scripts\activate` \
 `pip install -r requirements.txt`
  
-`uvicorn main:app --reload` or `python ./main.py`
+`uvicorn main:app --reload` or `python ./main.py` \
 API docs: `http://localhost:8000/docs`
 
 ## Setup Redis for Caching
