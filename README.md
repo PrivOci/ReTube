@@ -8,6 +8,13 @@ Subscriptions are saved locally in [`LocalStorage`](https://javascript.info/loca
 
 
 # Development
+I'm not a web developer and this one is my first project, if you like the idea please contribute, any kind of feedback is welcome. \
+Frontend is build using [`ReactJS`](https://reactjs.org) with [`Tailwinds`](https://tailwindcss.com). \
+Backend uses [`FastApi`](https://fastapi.tiangolo.com) and [`Redis`](https://redis.io).
+
+I chose them because they are very simple and easy-to-use.
+
+
 ## Backend
 `cd backend` \
 `pip3 install virtualenv` \
