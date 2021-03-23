@@ -15,7 +15,13 @@ The backend uses [`FastApi`](https://fastapi.tiangolo.com) and [`Redis`](https:/
 I chose them because they are very simple and easy-to-use.
 
 
-## Backend
+# Backend
+## Setup Redis for Caching
+
+`cd backend/redis` \
+`docker-compose up -d`
+
+## FastApi
 `cd backend` \
 `pip3 install virtualenv` \
 `python -m virtualenv venv` \
@@ -25,13 +31,7 @@ I chose them because they are very simple and easy-to-use.
 `uvicorn main:app --reload` or `python ./main.py` \
 API docs: `http://localhost:8000/docs`
 
-## Setup Redis for Caching
-
-`cd backend/redis` \
-`docker-compose up -d`
-
-
-## Frontend
+# Frontend
 `cd frontend` \
 `yarn` \
 `yarn start`
