@@ -1,0 +1,9 @@
+beautifulsoup4
+fastapi
+requests
+uvicorn
+xmltodict
+dateparser
+redis
+youtube-dl
+youtube-search

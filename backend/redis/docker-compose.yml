@@ -1,0 +1,23 @@
+# docker-compose.yml
+
+version: "3.2"
+services:
+  redis:
+    container_name: redis-cont
+    image: "redis:alpine"
+    environment:
+      - REDIS_PASSWORD=retube
+      - REDIS_REPLICATION_MODE=master
+    ports:
+      - "6379:6379"
+    volumes:
+      # save redisearch data to your current working directory
+      - ./redis-data:/data
+    command:
+      # Save if 100 keys are added in every 10 seconds
+      - "--save 10 100"
+      # Set password
+      - "--requirepass retube"
+
+volumes:
+  redis-data:
