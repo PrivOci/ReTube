@@ -15,8 +15,8 @@ The backend uses [`FastApi`](https://fastapi.tiangolo.com) and [`Redis`](https:/
 I chose them because they are very simple and easy-to-use.
 
 # Docker
-`git clone https://github.com/PrivOci/ReTube`
-`cd ReTube`
+`git clone https://github.com/PrivOci/ReTube` \
+`cd ReTube` \
 `docker-compose up -d`
 
 # Manual:

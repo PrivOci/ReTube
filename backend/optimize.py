@@ -2,14 +2,26 @@ import json
 import redis
 import sys
 from datetime import timedelta
+import socket
 
 DISABLE_CACHE = False
 
 
+def isOpen(ip, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect((ip, int(port)))
+        s.shutdown(2)
+        return True
+    except:
+        return False
+
+
 def redis_connect() -> redis.client.Redis:
+    host = "localhost" if isOpen("localhost", 6379) else "redis"
     try:
         client = redis.Redis(
-            host="redis",
+            host=host,
             port=6379,
             password="retube",
             db=0,
