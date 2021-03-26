@@ -23,6 +23,7 @@ import time
 
 app = FastAPI()
 
+import youtube_dl as yt
 
 # optimize.DISABLE_CACHE = True
 
@@ -90,7 +91,29 @@ async def get_video_from_source(details: dict) -> dict:
 
     # our extractors
     if details["platform"] == YOUTUBE:
-        result["content"] = youtube_video_details(video_url)
+        # TODO: fix
+        # result["content"] = youtube_video_details(video_url)
+        ydl_opts = {
+            'format': 'best'
+        }
+        with yt.YoutubeDL(ydl_opts) as ydl:
+            meta = ydl.extract_info(
+                video_url, download=False)
+
+            result["content"] = {
+                "id": f"{meta['id']}",
+                "description": f"{meta['description']}",
+                "author": f"{meta['uploader']}",
+                "duration": f"{meta['duration']}",
+                "view_count": f"{meta['view_count']}",
+                "average_rating": f"{meta['average_rating']}" if "average_rating" in meta else "",
+                "like_count": f"{meta['like_count']}" if "like_count" in meta else "",
+                "dislike_count": f"{meta['dislike_count']}" if "dislike_count" in meta else "",
+                "title": f"{meta['title']}",
+                "thumbnail": f"{meta['thumbnail']}",
+                "stream_url": f"{meta['url']}",
+                "channel_url": f"{meta['channel_url']}",
+            }
         result['ready'] = True
         result["platform"] = YOUTUBE
         return result

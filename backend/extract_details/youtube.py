@@ -46,5 +46,7 @@ def youtube_video_details(video_url):
         "dislike_count": "",
         "thumbnail": yt.thumbnail_url,
         "stream_url": stream_url,
+        # "channel_url": f"{meta['channel_url']}",
+
     }
     return video_details
