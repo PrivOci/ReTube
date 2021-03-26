@@ -1,6 +1,6 @@
 from extract_details.bitchute import bitchute_video_details, bitchute_search_video
 from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details
-from extract_details.youtube import youtube_search_videos
+from extract_details.youtube import youtube_search_videos, youtube_video_details
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,7 +9,6 @@ import uvicorn
 
 from pydantic import BaseModel
 
-import youtube_dl as yt
 import requests
 import xmltodict
 
@@ -71,13 +70,10 @@ BT_VIDEO_URL = "https://www.bitchute.com/video/"
 @app.post("/api/video/")
 async def get_video(details: request_details) -> dict:
     details.id = details.id.strip().strip("/")
-    return await optimize.optimized_request(dict(details), get_video_from_source)
+    return await optimize.optimized_request(dict(details), get_video_from_source, 5 if details.id == YOUTUBE else 72)
 
 
 async def get_video_from_source(details: dict) -> dict:
-    ydl_opts = {
-        'format': 'best'
-    }
     result = {}
     result['ready'] = False
 
@@ -93,7 +89,12 @@ async def get_video_from_source(details: dict) -> dict:
         return result
 
     # our extractors
-    if details["platform"] == BITCHUTE:
+    if details["platform"] == YOUTUBE:
+        result["content"] = youtube_video_details(video_url)
+        result['ready'] = True
+        result["platform"] = YOUTUBE
+        return result
+    elif details["platform"] == BITCHUTE:
         result["content"] = bitchute_video_details(video_url)
         result['ready'] = True
         result["platform"] = BITCHUTE
@@ -103,35 +104,8 @@ async def get_video_from_source(details: dict) -> dict:
         result['ready'] = True
         result["platform"] = LBRY
         return result
-
-    try:
-        with yt.YoutubeDL(ydl_opts) as ydl:
-            meta = ydl.extract_info(
-                video_url, download=False)
-    except:
-        return result
-
-    if details["platform"] == YOUTUBE:
-        result["content"] = {
-            "id": f"{meta['id']}",
-            "description": f"{meta['description']}",
-            "author": f"{meta['uploader']}",
-            "duration": f"{meta['duration']}",
-            "view_count": f"{meta['view_count']}",
-            "average_rating": f"{meta['average_rating']}" if "average_rating" in meta else "",
-            "like_count": f"{meta['like_count']}" if "like_count" in meta else "",
-            "dislike_count": f"{meta['dislike_count']}" if "dislike_count" in meta else "",
-            "title": f"{meta['title']}",
-            "thumbnail": f"{meta['thumbnail']}",
-            "stream_url": f"{meta['url']}",
-            "channel_url": f"{meta['channel_url']}",
-        }
     else:
         return result
-
-    result['ready'] = True
-    result["platform"] = details["platform"]
-    return result
 
 
 # YouTube channel to JSON
@@ -143,7 +117,7 @@ async def get_youtube_channel(details: request_details) -> dict:
     return await optimize.optimized_request(
         dict(details),
         get_youtube_videos_source,
-        optimize.set_cache_1)
+        1)
 
 
 async def get_youtube_videos_source(details: dict) -> dict:
@@ -187,7 +161,7 @@ async def get_youtube_playlist(details: request_details) -> dict:
     return await optimize.optimized_request(
         dict(details),
         get_youtube_videos_source,
-        optimize.set_cache_1)
+        1)
 
 
 # search youtube videos
@@ -198,7 +172,7 @@ async def youtube_search_results(search_query: search_query) -> dict:
     result = await optimize.optimized_request(
         dict(search_query),
         youtube_search_videos,
-        optimize.set_cache_1)
+        1)
     return result
 
 
@@ -207,10 +181,10 @@ async def youtube_search_results(search_query: search_query) -> dict:
 async def bitchute_search_results(search_query: search_query) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = BITCHUTE
-    result =  await optimize.optimized_request(
+    result = await optimize.optimized_request(
         dict(search_query),
         bitchute_search_video,
-        optimize.set_cache_1)
+        1)
     return result
 
 
@@ -222,7 +196,7 @@ async def lbry_search_results(search_query: search_query) -> dict:
     result = await optimize.optimized_request(
         dict(search_query),
         lbry_search_videos,
-        optimize.set_cache_1)
+        1)
     return result
 
 
@@ -235,7 +209,7 @@ async def get_lbry_channel(details: request_details) -> dict:
     return await optimize.optimized_request(
         dict(details),
         get_lbry_channel_source,
-        optimize.set_cache_1)
+        1)
 
 
 async def get_lbry_channel_source(details: dict) -> dict:
@@ -253,7 +227,7 @@ async def get_bitchute_channel(details: request_details):
     return await optimize.optimized_request(
         dict(details),
         get_bitchute_channel_source,
-        optimize.set_cache_1)
+        1)
 
 
 async def get_bitchute_channel_source(details: dict) -> dict:

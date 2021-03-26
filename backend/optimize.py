@@ -38,19 +38,11 @@ def redis_connect() -> redis.client.Redis:
 client = redis_connect()
 
 
-def set_cache_1(key: str, value: str) -> bool:
+def set_cache(key: str, value: str, hours = 24) -> bool:
     """Data to redis - 1 hour"""
 
-    state = client.setex(key, timedelta(hours=1), value=value,)
+    state = client.setex(key, timedelta(hours=hours), value=value,)
     return state
-
-
-def set_cache_24(key: str, value: str) -> bool:
-    """Data to redis - 24 hours"""
-
-    state = client.setex(key, timedelta(hours=24), value=value,)
-    return state
-
 
 async def get_from_cache(key: str) -> str:
     """Data from redis."""
@@ -59,7 +51,7 @@ async def get_from_cache(key: str) -> str:
     return val
 
 
-async def optimized_request(details, get_from_source, cache_func=set_cache_24):
+async def optimized_request(details, get_from_source, hours=24):
 
     key_for_redis = json.dumps(details)
     # First it looks for the data in redis cache
@@ -82,7 +74,7 @@ async def optimized_request(details, get_from_source, cache_func=set_cache_24):
         # This block sets saves the respose to redis and serves it directly
         if data.get("ready") == True:
             data["cache"] = False
-            state = cache_func(key_for_redis, json.dumps(data))
+            state = set_cache(key_for_redis, json.dumps(data), hours)
 
             if state is True:
                 return data

@@ -5,5 +5,5 @@ uvicorn
 xmltodict
 dateparser
 redis
-youtube-dl
 youtube-search-python
+pytube
