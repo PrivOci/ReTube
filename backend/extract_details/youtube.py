@@ -1,5 +1,6 @@
-from youtubesearchpython import VideosSearch
+from youtubesearchpython import VideosSearch, ChannelsSearch
 from pytube import YouTube
+import urllib.parse
 
 YOUTUBE = "yt"
 
@@ -50,3 +51,31 @@ def youtube_video_details(video_url):
 
     }
     return video_details
+
+
+def youtube_channel_search(search_terms):
+    '''Searches for channels in YouTube.
+
+    Args:
+        search_terms (str): search query.
+    '''
+    encoded_query = urllib.parse.quote_plus(search_terms)
+    search_result = ChannelsSearch(encoded_query, limit=3).result()
+    data_dict = {}
+    data_dict["platform"] = YOUTUBE
+    channel_entries = []
+    for channel in search_result["result"]:
+        channel_entry = {}
+        channel_entry["isChannel"] = True
+        channel_entry["id"] = channel["id"]
+        channel_entry["thumbSrc"] = channel["thumbnails"][-1]["url"]
+        channel_entry["title"] = channel["title"]
+        channel_entry["channel"] = channel["title"]
+        channel_entry["channelUrl"] = channel["link"]
+        channel_entry["videoCount"] = channel["videoCount"]
+        channel_entry["platform"] = YOUTUBE
+        channel_entries.append(channel_entry)
+
+    data_dict["content"] = channel_entries
+    data_dict["ready"] = True
+    return data_dict

@@ -93,7 +93,7 @@ function App() {
   }, [storeReadOnly]);
 
   return (
-    <>
+    <div className="bg-gray-100 dark:bg-gray-600">
       <Route>
         <Bar />
         <main className="flex bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden relative">
@@ -116,7 +116,7 @@ function App() {
         </main>
         <Footer />
       </Route>
-    </>
+    </div>
   );
 }
 
