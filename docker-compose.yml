@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    environment:
+      - REDIS_PASSWORD=retube
+      - REDIS_REPLICATION_MODE=master
+    volumes:
+      # save redisearch data to your current working directory
+      - ./redis-data:/data
+    command:
+      # Save if 100 keys are added in every 10 seconds
+      - "--save 10 100"
+      # Set password
+      - "--requirepass retube"
+    restart: unless-stopped
+  backend:
+    build: ./backend
+    ports:
+      - "8000:80"
+    depends_on:
+      - redis
+    restart: unless-stopped
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  redis-data:

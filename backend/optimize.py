@@ -9,7 +9,7 @@ DISABLE_CACHE = False
 def redis_connect() -> redis.client.Redis:
     try:
         client = redis.Redis(
-            host="localhost",
+            host="redis",
             port=6379,
             password="retube",
             db=0,
