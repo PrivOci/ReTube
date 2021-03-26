@@ -19,8 +19,6 @@ import { useSnapshot } from "valtio";
 import subscriptions from "./store";
 import JsonEdit from "./Components/JsonEdit";
 
-import Test from "./Components/Test";
-
 const pages = [
   {
     name: "Popular",
@@ -81,10 +79,6 @@ const ContentPages = [
   {
     path: "/json",
     component: JsonEdit,
-  },
-  {
-    path: "/test",
-    component: Test,
   },
 ];
 
