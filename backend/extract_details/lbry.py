@@ -105,22 +105,33 @@ def _parse_lbry_details(entry) -> dict:
     video_entry = {}
     if 'value' not in entry:
         return {}
-    if 'video' not in entry["value"]:
+    if 'thumbnail' not in entry["value"]:
         return {}
-    if 'url' not in entry["value"]["thumbnail"]:
-        return {}
-    video_entry["thumbSrc"] = entry["value"]["thumbnail"]["url"]
-    video_entry["title"] = entry["value"]["title"]
-    # TODO: problems with anonymous videos
-    if 'value' not in entry["signing_channel"]:
-        return {}
-    video_entry["channel"] = entry["signing_channel"]["value"].get(
-        "title", entry["signing_channel"]["name"])
-    video_entry["views"] = ""
-    video_entry["createdAt"] = int(entry["timestamp"]) * 1000
-    video_entry["videoUrl"] = lbry_to_normal_url(entry["canonical_url"])
-
     video_entry["platform"] = LBRY
+
+    if 'url' in entry["value"]["thumbnail"]:
+        video_entry["thumbSrc"] = entry["value"]["thumbnail"]["url"]
+    else:
+        video_entry["thumbSrc"] = "https://user-images.githubusercontent.com/74614193/112720980-68bab700-8ef9-11eb-9319-0e79508b6e7e.png"
+    if "title" in entry["value"]:
+        video_entry["title"] = entry["value"]["title"]
+    else:
+        video_entry["title"] = entry["name"]
+    if entry["value_type"] == "channel":
+        video_entry["isChannel"] = True
+        video_entry["channelUrl"] = lbry_to_normal_url(entry["canonical_url"])
+    elif entry["value_type"] == "stream" and 'video' in entry["value"]:
+        if 'value' not in entry["signing_channel"]:
+            video_entry["channel"] = "Anonymous"
+        else:
+            video_entry["channel"] = entry["signing_channel"]["value"].get(
+                "title", entry["signing_channel"]["name"])
+        video_entry["views"] = ""
+        video_entry["createdAt"] = int(entry["timestamp"]) * 1000
+        video_entry["videoUrl"] = lbry_to_normal_url(entry["canonical_url"])
+    else:
+        return video_entry
+
     return video_entry
 
 
@@ -238,6 +249,47 @@ async def lbry_popular():
     video_entries = []
     for entry in results_json["result"]["items"]:
         video_entry = _parse_lbry_details(entry)
+        if video_entry:
+            video_entries.append(video_entry)
+
+    data_dict["content"] = video_entries
+    data_dict["ready"] = True
+    return data_dict
+
+
+async def lbry_channel_search(search_query):
+    '''Searches for channels in Lbry.
+
+    Args:
+        search_terms (str): search query.
+    '''
+    channel_name = search_query["query"]
+    max_results = search_query["max"]
+    channel_name = channel_name.replace(" ", "").replace("+", "")
+    channel_name = f"lbry://@{channel_name}"
+    data = {
+        "jsonrpc": "2.0",
+        "method": "resolve",
+        "params": {
+            "urls": [
+                channel_name
+            ],
+            "include_purchase_receipt": True
+        }
+    }
+
+    response = requests.post(
+        'https://api.lbry.tv/api/v1/proxy?m=resolve', headers=_headers, data=json.dumps(data))
+    data = response.json()
+
+    data_dict = {}
+    data_dict["platform"] = LBRY
+    video_entries = []
+    for entry in data["result"]:
+        current_entry = data["result"][entry]
+        if "error" in current_entry:
+            continue
+        video_entry = _parse_lbry_details(current_entry)
         if video_entry:
             video_entries.append(video_entry)
 

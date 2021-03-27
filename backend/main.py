@@ -1,6 +1,6 @@
 import youtube_dl as yt
 from extract_details.bitchute import bitchute_video_details, bitchute_search_video
-from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details
+from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details, lbry_channel_search
 from extract_details.youtube import youtube_search_videos, youtube_video_details, youtube_channel_search
 
 from fastapi import FastAPI
@@ -208,6 +208,19 @@ async def youtube_search_channels(search_query: search_query) -> dict:
     result = await optimize.optimized_request(
         dict(search_query),
         youtube_channel_search,
+        1)
+    return result
+
+
+# search Lbry channels
+@app.post("/api/lbry/channels/")
+async def lbry_search_channels(search_query: search_query) -> dict:
+    search_query = dict(search_query)
+    search_query["platform"] = LBRY
+    search_query["max"] = 3
+    result = await optimize.optimized_request(
+        dict(search_query),
+        lbry_channel_search,
         1)
     return result
 
