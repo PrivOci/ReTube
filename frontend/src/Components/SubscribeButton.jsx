@@ -34,7 +34,7 @@ const SubscribeButton = ({ channel_url }) => {
 
   return (
     <button
-      className="flex items-center shadow bg-blue-500 mt-2 px-4 py-2 text-white hover:bg-blue-400 rounded-lg"
+      className="items-center shadow bg-blue-500 mt-2 px-4 py-2 text-white hover:bg-blue-400 rounded-lg"
       onClick={() => {
         let [platform, id] = channelUrlDetails(channel_url);
         switch (platform) {

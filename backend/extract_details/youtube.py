@@ -53,14 +53,15 @@ def youtube_video_details(video_url):
     return video_details
 
 
-def youtube_channel_search(search_terms):
+async def youtube_channel_search(search_query):
     '''Searches for channels in YouTube.
 
     Args:
         search_terms (str): search query.
     '''
-    encoded_query = urllib.parse.quote_plus(search_terms)
-    search_result = ChannelsSearch(encoded_query, limit=3).result()
+    search_words = search_query["query"]
+    max_results = search_query["max"]
+    search_result = ChannelsSearch(search_words, limit=max_results).result()
     data_dict = {}
     data_dict["platform"] = YOUTUBE
     channel_entries = []
@@ -68,7 +69,10 @@ def youtube_channel_search(search_terms):
         channel_entry = {}
         channel_entry["isChannel"] = True
         channel_entry["id"] = channel["id"]
-        channel_entry["thumbSrc"] = channel["thumbnails"][-1]["url"]
+        thumb = channel["thumbnails"][-1]["url"]
+        if thumb.startswith("//"):
+            thumb = f"https:{thumb}"
+        channel_entry["thumbSrc"] = thumb
         channel_entry["title"] = channel["title"]
         channel_entry["channel"] = channel["title"]
         channel_entry["channelUrl"] = channel["link"]

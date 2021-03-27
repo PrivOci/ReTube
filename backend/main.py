@@ -1,6 +1,7 @@
+import youtube_dl as yt
 from extract_details.bitchute import bitchute_video_details, bitchute_search_video
 from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details
-from extract_details.youtube import youtube_search_videos, youtube_video_details
+from extract_details.youtube import youtube_search_videos, youtube_video_details, youtube_channel_search
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +24,6 @@ import time
 
 app = FastAPI()
 
-import youtube_dl as yt
 
 # optimize.DISABLE_CACHE = True
 
@@ -195,6 +195,19 @@ async def youtube_search_results(search_query: search_query) -> dict:
     result = await optimize.optimized_request(
         dict(search_query),
         youtube_search_videos,
+        1)
+    return result
+
+
+# search youtube channels
+@app.post("/api/youtube/channels/")
+async def youtube_search_channels(search_query: search_query) -> dict:
+    search_query = dict(search_query)
+    search_query["platform"] = YOUTUBE
+    search_query["max"] = 3
+    result = await optimize.optimized_request(
+        dict(search_query),
+        youtube_channel_search,
         1)
     return result
 

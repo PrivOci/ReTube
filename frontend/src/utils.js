@@ -10,6 +10,8 @@ const YOUTUBE_SEARCH = `${BACKEND_URL}/api/youtube/search/`;
 const LBRY_SEARCH = `${BACKEND_URL}/api/lbry/search/`;
 const BITCHUTE_SEARCH = `${BACKEND_URL}/api/bitchute/search/`;
 
+const YOUTUBE_SEARCH_CHANNELS = `${BACKEND_URL}/api/youtube/channels`;
+
 // shared
 const YOUTUBE = "yt";
 const LBRY = "lb";
@@ -140,6 +142,7 @@ const fetchSearchAPi = async (search_api_url, search_query) => {
 
 export const fetchSearchResults = async (search_query) => {
   let allWait = [];
+  allWait.push(fetchSearchAPi(YOUTUBE_SEARCH_CHANNELS, search_query));
   allWait.push(fetchSearchAPi(YOUTUBE_SEARCH, search_query));
   allWait.push(fetchSearchAPi(LBRY_SEARCH, search_query));
   allWait.push(fetchSearchAPi(BITCHUTE_SEARCH, search_query));
