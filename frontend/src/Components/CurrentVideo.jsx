@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
+import useSWR from "swr";
 
 import Skeleton from "./Skeleton";
 import VideoPlayer from "./VideoPlayer";
@@ -7,6 +8,29 @@ import VideoPlayer from "./VideoPlayer";
 import { videoUrlDetails } from "../utils";
 
 const VIDEO_API = "api/video/";
+
+const fetchVideoMetaSWR = async (platform_id) => {
+  const { platform, id } = JSON.parse(platform_id);
+
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      platform: platform,
+      id: id,
+    }),
+  };
+  return fetch(`http://localhost:8000/${VIDEO_API}`, requestOptions)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.ready === false) {
+        console.log("failed to get video details");
+        return {};
+      }
+
+      return data.content;
+    });
+};
 
 const VideoPage = ({ location }) => {
   const CurrentLocation = useLocation();
@@ -18,50 +42,29 @@ const VideoPage = ({ location }) => {
 
   let [platform, id] = videoUrlDetails(url);
 
-  const [videoMeta, setVideoMeta] = useState(null);
-
   console.log(`watch: p:${platform} id:${id}`);
-  useEffect(() => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        platform: platform,
-        id: id,
-      }),
-    };
-    fetch(`http://localhost:8000/${VIDEO_API}`, requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("video rec data:");
-        console.log(data);
-        if (data.ready === false) {
-          console.log("failed to get video details");
-          return;
-        }
 
-        var videoData = data.content;
-        setVideoMeta(videoData);
-        console.log(videoData);
-      });
-  }, [platform, id]);
-
+  const { data } = useSWR(
+    JSON.stringify({ platform, id }),
+    fetchVideoMetaSWR
+  );
+  
   const videoProps = {
     controls: true,
-    url: videoMeta ? videoMeta.stream_url : null,
-    light: videoMeta ? videoMeta.thumbnail_url : null,
+    url: data ? data.stream_url : null,
+    light: data ? data.thumbnail_url : null,
     // https://github.com/CookPete/react-player#props
   };
 
   return (
     <div className="flex justify-center">
-      {!videoProps.url ? (
+      {!data || !videoProps.url ? (
         <div className="w-1/2 justify-center">
           <Skeleton />
         </div>
       ) : (
         <div>
-          <VideoPlayer videoProps={videoProps} details={videoMeta} />
+          <VideoPlayer videoProps={videoProps} details={data} />
         </div>
       )}
     </div>

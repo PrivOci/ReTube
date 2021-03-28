@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReactJson from "react-json-view";
 import { useSnapshot } from "valtio";
 import subscriptions from "../store";

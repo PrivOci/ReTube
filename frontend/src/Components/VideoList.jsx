@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
 
 import videoBoxes from "./SmallVideoBox";
 
 import fetchVideos, { fetchPopularVideos, fetchSearchResults } from "../utils";
 
+import useSWR from "swr";
+
+const fetchDataSWR = async (url_search) => {
+  const { url, search } = JSON.parse(url_search);
+
+  if (url === "popular") {
+    return fetchPopularVideos();
+  } else if (search) {
+    return fetchSearchResults(decodeURI(search));
+  } else {
+    return fetchVideos(url);
+  }
+};
+
 function VideoList({ location }) {
-  const [videoData, setVideoDataState] = useState([]);
   const CurrentLocation = useLocation();
 
   console.log(location);
@@ -17,36 +30,16 @@ function VideoList({ location }) {
 
   let search = location.search.split("search=")[1];
 
-  useEffect(() => {
-    if (url === "popular") {
-      fetchPopularVideos().then((response) => {
-        console.log("popular video list updated");
-        console.log(response);
-        setVideoDataState(response);
-      });
-    } else if (search) {
-      console.log("search term: " + search);
-      fetchSearchResults(decodeURI(search)).then((response) => {
-        console.log("search results updated");
-        setVideoDataState(response);
-      });
-    } else {
-      fetchVideos(url).then((response) => {
-        console.log("video list updated");
-        setVideoDataState(response);
-      });
-    }
-
-    return () => {
-      setVideoDataState([]);
-    };
-  }, [url, search]);
+  const { data, error, isValidating, mutate } = useSWR(
+    JSON.stringify({ url, search }),
+    fetchDataSWR
+  );
 
   return (
     <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-      {(!videoData || !videoData.content || !videoData.content.length
+      {(error || !data || !data.content || !data.content.length
         ? Array.from(new Array(3))
-        : videoData.content
+        : data.content
       ).map((item, index) => videoBoxes(item, index))}
     </div>
   );
