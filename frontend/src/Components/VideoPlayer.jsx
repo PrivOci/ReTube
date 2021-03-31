@@ -1,11 +1,14 @@
 import React from "react";
 import ReactPlayer from "react-player";
 // import Draggable from "react-draggable";
-import SubscribeButton from "./SubscribeButton"
+import SubscribeButton from "./SubscribeButton";
+import { platforms } from "../utils";
 
-const VideoPlayer = ({ videoProps, details }) => {
+const VideoPlayer = ({ videoProps, details, platform, url }) => {
+  const platformName = platforms[platform];
+
   return (
-    <>
+    <div className="grid grid-cols-1">
       <div className="shadow-lg justify-center rounded-2xl p-4 bg-white dark:bg-gray-700 w-full">
         <div className="aspect-w-16 aspect-h-9 lg:aspect-none flex justify-center">
           <ReactPlayer {...videoProps} width="100%" height="100%" />
@@ -23,10 +26,22 @@ const VideoPlayer = ({ videoProps, details }) => {
               {details.author}
             </a>
           </p>
-          <SubscribeButton channel_url={details.channel_url}/>
+          <div className="flex space-x-4">
+            <SubscribeButton channel_url={details.channel_url} />
+            <button
+              className="items-center shadow bg-red-500 mt-2 px-4 py-2 text-white hover:bg-red-400 rounded-lg"
+              onClick={() => window.open(url, "_blank")}
+            >
+              Watch On {platformName}
+            </button>
+          </div>
         </div>
       </div>
-    </>
+
+      <div className="shadow-lg justify-center rounded-2xl p-4 mt-2 bg-white dark:bg-gray-700 w-full text-black dark:text-white">
+        <pre>{details.description}</pre>
+      </div>
+    </div>
   );
 };
 

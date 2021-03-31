@@ -30,7 +30,7 @@ function VideoList({ location }) {
 
   let search = location.search.split("search=")[1];
 
-  const { data, error, isValidating, mutate } = useSWR(
+  const { data, error } = useSWR(
     JSON.stringify({ url, search }),
     fetchDataSWR
   );

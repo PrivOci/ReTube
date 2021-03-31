@@ -44,11 +44,8 @@ const VideoPage = ({ location }) => {
 
   console.log(`watch: p:${platform} id:${id}`);
 
-  const { data } = useSWR(
-    JSON.stringify({ platform, id }),
-    fetchVideoMetaSWR
-  );
-  
+  const { data } = useSWR(JSON.stringify({ platform, id }), fetchVideoMetaSWR);
+
   const videoProps = {
     controls: true,
     url: data ? data.stream_url : null,
@@ -64,7 +61,12 @@ const VideoPage = ({ location }) => {
         </div>
       ) : (
         <div>
-          <VideoPlayer videoProps={videoProps} details={data} />
+          <VideoPlayer
+            videoProps={videoProps}
+            details={data}
+            platform={platform}
+            url={url}
+          />
         </div>
       )}
     </div>

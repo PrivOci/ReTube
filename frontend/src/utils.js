@@ -13,7 +13,6 @@ const BITCHUTE_SEARCH = `${BACKEND_URL}/api/bitchute/search/`;
 const YOUTUBE_SEARCH_CHANNELS = `${BACKEND_URL}/api/youtube/channels`;
 const LBRY_SEARCH_CHANNELS = `${BACKEND_URL}/api/lbry/channels`;
 
-
 // shared
 const YOUTUBE = "yt";
 const LBRY = "lb";
