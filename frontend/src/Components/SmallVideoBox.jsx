@@ -5,9 +5,9 @@ import SubscribeButton from "./SubscribeButton";
 
 const VideoThumbnail = ({ item }) => {
   const platform = platforms[item.platform];
-
+  // console.log(item);
   return (
-    <div className="each mb-10 m-2">
+    <div className="each mb-10 m-2 inline-block align-middle">
       <a href={`/watch?url=${item.videoUrl}`} alt="video source">
         <img
           src={item.thumbSrc}
@@ -20,16 +20,18 @@ const VideoThumbnail = ({ item }) => {
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>
 
-      <p className="text-xs text-gray-600 hover:text-black dark:text-grey">
-        {item.creator}
+      {/* <a href={`videolist?url=${item.channelUrl}`} alt="channel"> */}
+      <p className="text-xs text-gray-600 hover:text-black dark:text-gray-400">
+        {item.channel}
       </p>
+      {/* </a> */}
     </div>
   );
 };
 
 const ChannelThumbnail = ({ item }) => {
   const platform = platforms[item.platform];
-  console.log(item);
+  // console.log(item);
   return (
     <div className="each mb-10 m-2 inline-block align-middle">
       <a href={`videolist?url=${item.channelUrl}`} alt="video source">
@@ -44,7 +46,7 @@ const ChannelThumbnail = ({ item }) => {
         <SubscribeButton channel_url={item.channelUrl} />
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>
-      <p className="text-xs text-gray-600 hover:text-black dark:text-grey">
+      <p className="text-xs text-gray-600 hover:text-black dark:text-gray-400">
         {item.creator}
       </p>
     </div>
