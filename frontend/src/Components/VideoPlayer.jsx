@@ -14,10 +14,10 @@ const VideoPlayer = ({ videoProps, details, platform, url }) => {
           <ReactPlayer {...videoProps} width="100%" height="100%" />
         </div>
         <div className="pt-3">
-          <h3 className="mr-10 text-md truncate-2nd text-black dark:text-white antialiased sm:subpixel-antialiased md:antialiased">
+          <h3 className="mr-10 text-lg truncate-2nd text-black dark:text-white antialiased sm:subpixel-antialiased md:antialiased">
             {details.title}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-md text-gray-500">
             <a
               href={`/videolist?url=${details.channel_url}`}
               alt="channel"
@@ -26,6 +26,10 @@ const VideoPlayer = ({ videoProps, details, platform, url }) => {
               {details.author}
             </a>
           </p>
+          <h3 className="mr-10 text-md text-black dark:text-white antialiased sm:subpixel-antialiased md:antialiased">
+            {details.view_count} views
+          </h3>
+
           <div className="flex space-x-4">
             <SubscribeButton channel_url={details.channel_url} />
             <button
@@ -39,7 +43,7 @@ const VideoPlayer = ({ videoProps, details, platform, url }) => {
       </div>
 
       <div className="shadow-lg justify-center rounded-2xl p-4 mt-2 bg-white dark:bg-gray-700 w-full text-black dark:text-white">
-        <pre>{details.description}</pre>
+        <div className="whitespace-pre-line">{details.description}</div>
       </div>
     </div>
   );

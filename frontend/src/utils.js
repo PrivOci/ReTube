@@ -134,7 +134,7 @@ const fetchSearchAPi = async (search_api_url, search_query) => {
     }),
   };
 
-  const data = await fetch(search_api_url, requestOptions).then((response) =>
+  const data = fetch(search_api_url, requestOptions).then((response) =>
     response.json()
   );
 

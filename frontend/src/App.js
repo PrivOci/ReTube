@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import VideoList from "./Components/VideoList";
 import VideoPage from "./Components/CurrentVideo";
-import { useLocation } from "react-router-dom";
+import { useLocation, Redirect } from "react-router-dom";
 
 import Bar from "./Components/Bar";
 import Sidebar from "./Components/Sidebar";
@@ -97,11 +97,11 @@ function App() {
       <Route>
         <Bar />
         <main className="flex bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden relative">
-          <Sidebar
-            pages={pages}
-            location={location}
-          />
+          <Sidebar pages={pages} location={location} />
           <Content>
+            <Route exact path="/">
+              <Redirect to="/videolist?url=popular" />
+            </Route>
             {ContentPages.map((page, index) => {
               return (
                 <Route
