@@ -31,7 +31,7 @@ const VideoPlayer = ({ videoProps, details, platform, url }) => {
           </h3>
 
           <div className="flex space-x-4">
-            <SubscribeButton channel_url={details.channel_url} />
+            <SubscribeButton channel_url={details.channel_url} count={details.subscriber_count}/>
             <button
               className="items-center shadow bg-red-500 mt-2 px-4 py-2 text-white hover:bg-red-400 rounded-lg"
               onClick={() => window.open(url, "_blank")}

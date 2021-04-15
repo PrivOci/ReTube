@@ -10,7 +10,7 @@ const BITCHUTE = "bc";
 
 const IsSubscribed = (subsReadOnly, channel_url) => {
   let [platform, id] = channelUrlDetails(channel_url);
-  console.log(`id: ${id}`);
+
   switch (platform) {
     case YOUTUBE:
       return subsReadOnly.youtube.includes(id);
@@ -23,7 +23,7 @@ const IsSubscribed = (subsReadOnly, channel_url) => {
   }
 };
 
-const SubscribeButton = ({ channel_url }) => {
+const SubscribeButton = ({ channel_url, count }) => {
   const subsReadOnly = useSnapshot(subscriptions);
   const [isSubscribed, setIsSubscribed] = useState(false);
   useEffect(() => {
@@ -66,7 +66,7 @@ const SubscribeButton = ({ channel_url }) => {
         }
       }}
     >
-      {isSubscribed ? "Unsubscribe" : "Subscribe"}
+      {isSubscribed ? `Unsubscribe [${count}]` : `Subscribe [${count}]`}
     </button>
   );
 };
