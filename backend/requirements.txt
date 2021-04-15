@@ -8,3 +8,4 @@ redis
 youtube-search-python
 pytube
 youtube_dl
+gingerit
