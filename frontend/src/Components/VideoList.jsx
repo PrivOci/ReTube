@@ -30,17 +30,34 @@ function VideoList({ location }) {
 
   let search = location.search.split("search=")[1];
 
-  const { data, error } = useSWR(
-    JSON.stringify({ url, search }),
-    fetchDataSWR
-  );
+  const { data, error } = useSWR(JSON.stringify({ url, search }), fetchDataSWR);
 
   return (
-    <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-      {(error || !data || !data.content || !data.content.length
-        ? Array.from(new Array(3))
-        : data.content
-      ).map((item, index) => videoBoxes(item, index))}
+    <div>
+      {data && "suggestion" in data ? (
+        <h3 className="text-md text-black dark:text-white antialiased sm:subpixel-antialiased">
+          {`Do you mean: `}
+          <span>
+            <a
+              href={`videolist?search=${data.suggestion}`}
+              alt="search"
+              className="hover:underline text-blue-400 hover:text-blue-500"
+            >
+              {data.suggestion}
+            </a>
+          </span>
+        </h3>
+      ) : (
+        <span />
+      )}
+
+      <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+        {/* TODO: sub-header: channel info / search query */}
+        {(error || !data || !data.content || !data.content.length
+          ? Array.from(new Array(3))
+          : data.content
+        ).map((item, index) => videoBoxes(item, index))}
+      </div>
     </div>
   );
 }

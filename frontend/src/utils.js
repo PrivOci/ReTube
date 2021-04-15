@@ -13,6 +13,8 @@ const BITCHUTE_SEARCH = `${BACKEND_URL}/api/bitchute/search/`;
 const YOUTUBE_SEARCH_CHANNELS = `${BACKEND_URL}/api/youtube/channels`;
 const LBRY_SEARCH_CHANNELS = `${BACKEND_URL}/api/lbry/channels`;
 
+const CHECK_GRAMMAR_API = `${BACKEND_URL}/api/check`;
+
 // shared
 const YOUTUBE = "yt";
 const LBRY = "lb";
@@ -141,7 +143,34 @@ const fetchSearchAPi = async (search_api_url, search_query) => {
   return data;
 };
 
+const is_spell_checker_enabled = () => {
+  const config = JSON.parse(localStorage.getItem("config"));
+  return config["spell_checker"];
+};
+
+const check_sentence = async (str) => {
+  if (!is_spell_checker_enabled()) {
+    return { need_change: false, result: "" };
+  }
+
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: str,
+    }),
+  };
+
+  const data = fetch(CHECK_GRAMMAR_API, requestOptions).then((response) =>
+    response.json()
+  );
+
+  return data;
+};
+
 export const fetchSearchResults = async (search_query) => {
+  const check_query = check_sentence(search_query);
+
   let allWait = [];
   allWait.push(fetchSearchAPi(YOUTUBE_SEARCH_CHANNELS, search_query));
   allWait.push(fetchSearchAPi(LBRY_SEARCH_CHANNELS, search_query));
@@ -162,8 +191,13 @@ export const fetchSearchResults = async (search_query) => {
 
     allSearch.content = allSearch.content.concat(result.content);
   }
-
   allSearch.ready = true;
+
+  const check_result = await check_query;
+  if (check_result.need_change) {
+    allSearch.suggestion = check_result.result;
+  }
+  // console.log(check_result);
   return allSearch;
 };
 

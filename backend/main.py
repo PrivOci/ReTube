@@ -2,6 +2,7 @@ import youtube_dl as yt
 from extract_details.bitchute import bitchute_video_details, bitchute_search_video
 from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details, lbry_channel_search
 from extract_details.youtube import youtube_search_videos, youtube_video_details, youtube_channel_search
+from spelling import ginger_check_sentence
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -62,10 +63,18 @@ class search_query(BaseModel):
     query: str
     max: int
 
+class just_string(BaseModel):
+    query: str
+
 
 LB_VIDEO_URL = "https://lbry.tv/"
 YT_VIDEO_URL = "https://www.youtube.com/watch?v="
 BT_VIDEO_URL = "https://www.bitchute.com/video/"
+
+
+@app.post("/api/check")
+async def check_sentence(just_string: just_string):
+    return ginger_check_sentence(just_string.query)
 
 
 @app.post("/api/video/")
