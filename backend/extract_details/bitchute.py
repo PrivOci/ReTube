@@ -5,9 +5,43 @@ import urllib.parse
 BITCHUTE = "bc"
 
 
+
+
 def bitchute_video_details(video_url) -> dict:
     req = requests.get(video_url)
     soup = BeautifulSoup(req.text, 'html.parser')
+
+    # grab cfduid and csrftoken
+    # TODO: extract as a class
+    session = requests.Session()
+    response = session.get('https://www.bitchute.com/help-us-grow/')
+    cookies = session.cookies.get_dict()
+    cfduid = cookies["__cfduid"]
+    csrftoken = cookies["csrftoken"]
+
+    headers = {
+        'authority': 'www.bitchute.com',
+        'accept': '*/*',
+        'dnt': '1',
+        'x-requested-with': 'XMLHttpRequest',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.116 Safari/537.36',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'origin': 'https://www.bitchute.com',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-dest': 'empty',
+        'referer': f'{video_url}',
+        'accept-language': 'en-US,en-GB;q=0.9,en;q=0.8',
+        'cookie': f'__cfduid={cfduid}; csrftoken={csrftoken}; registration=on;',
+    }
+
+    data = {
+        'csrfmiddlewaretoken': f'{csrftoken}'
+    }
+
+    count_req = requests.post(
+        'https://www.bitchute.com/video/6uhZnVIkzWyr/counts/', headers=headers, data=data)
+    count_json = count_req.json()
 
     video_details = {
         "id": video_url.split("/video/")[1].strip().strip('/'),
@@ -17,10 +51,11 @@ def bitchute_video_details(video_url) -> dict:
         "channel_url": "https://bitchute.com" +
         soup.find("p", {"class": "video-card-channel"}).a["href"],
         "duration": "",
-        "view_count": soup.find("span", {"id": "video-view-count"}).text,
+        "view_count": count_json["view_count"],
         "average_rating": "",
-        "like_count": soup.find("span", {"id": "video-like-count"}).text,
-        "dislike_count": soup.find("span", {"id": "video-dislike-count"}).text,
+        "like_count": count_json["like_count"],
+        "dislike_count": count_json["dislike_count"],
+        "subscriber_count": count_json["subscriber_count"],
         "thumbnail": soup.find("video", {"id": "player"})["poster"],
         "stream_url": soup.find("video", {"id": "player"}).source["src"],
     }
