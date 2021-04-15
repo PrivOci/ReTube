@@ -17,10 +17,10 @@ def bitchute_video_details(video_url) -> dict:
         "channel_url": "https://bitchute.com" +
         soup.find("p", {"class": "video-card-channel"}).a["href"],
         "duration": "",
-        "view_count": "",
+        "view_count": soup.find("span", {"id": "video-view-count"}).text,
         "average_rating": "",
-        "like_count": "",
-        "dislike_count": "",
+        "like_count": soup.find("span", {"id": "video-like-count"}).text,
+        "dislike_count": soup.find("span", {"id": "video-dislike-count"}).text,
         "thumbnail": soup.find("video", {"id": "player"})["poster"],
         "stream_url": soup.find("video", {"id": "player"}).source["src"],
     }
