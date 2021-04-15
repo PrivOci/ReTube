@@ -45,7 +45,7 @@ def bitchute_video_details(video_url) -> dict:
 
     video_details = {
         "id": video_url.split("/video/")[1].strip().strip('/'),
-        "title": soup.find("div", {"class": "title"}).text,
+        "title": soup.find("h1", {"id": "video-title"}).text,
         "description": soup.find("meta", {"name": "description"})["content"],
         "author": soup.find("p", {"class": "video-card-channel"}).a.text,
         "channel_url": "https://bitchute.com" +
