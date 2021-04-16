@@ -140,9 +140,11 @@ def lbry_video_details(video_url):
 
     json_details = _get_details([lbry_url])[lbry_url]
     video_url = get_video_url(lbry_url)
+    claim_id = json_details["claim_id"]
+    view_count = get_view_count(claim_id)
 
     video_details = {
-        "id": json_details["claim_id"],
+        "id": claim_id,
         "title": json_details["value"]["title"],
         "description": json_details["value"].get(
             "description", ""),
@@ -152,7 +154,7 @@ def lbry_video_details(video_url):
             json_details["signing_channel"]["short_url"].replace(
                 "lbry://", "https://odysee.com/").replace("#", ":"),
         "duration": json_details["value"]["video"]["duration"],
-        "view_count": "",
+        "view_count": view_count,
         "average_rating": "",
         "like_count": "",
         "dislike_count": "",
@@ -160,6 +162,23 @@ def lbry_video_details(video_url):
         "stream_url": video_url,
     }
     return video_details
+
+
+def get_view_count(claim_id):
+    # get auth_token cookie
+    # session = requests.Session()
+    # session.get('https://odysee.com/$/help')
+    # cookies = session.cookies.get_dict()
+    # TODO: remove the hardcoded value
+    auth_token = "7TCpVMwB4AYWsoihB2Emaj7G5pEZZ8zE"  # cookies["auth_token"]
+
+    response = requests.get(
+        f'https://api.lbry.com/file/view_count?auth_token={auth_token}&claim_id={claim_id}', headers=_headers)
+    data = response.json()
+    if "success" in data and data["success"] == True:
+        return data["data"]
+    else:
+        return 0
 
 
 def lbry_channel_details(channel_id):

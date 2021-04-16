@@ -10,6 +10,7 @@ import Content from "./Components/Content";
 import Footer from "./Components/footer";
 import VideoPlayer from "./Components/VideoPlayer";
 import Subscriptions from "./Components/Subscriptions";
+import Settings from "./Components/Settings";
 
 import { Route } from "react-router-dom";
 
@@ -79,6 +80,10 @@ const ContentPages = [
   {
     path: "/json",
     component: JsonEdit,
+  },
+  {
+    path: "/settings",
+    component: Settings,
   },
 ];
 

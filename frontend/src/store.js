@@ -5,9 +5,6 @@ const subscriptions = proxy(
     youtube: [],
     lbry: [],
     bitchute: [],
-    config: {
-      "spell_checker": false,
-    },
   }
 );
 
