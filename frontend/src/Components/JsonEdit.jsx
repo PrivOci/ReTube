@@ -1,7 +1,7 @@
 import React from "react";
 import ReactJson from "react-json-view";
 import { useSnapshot } from "valtio";
-import subscriptions from "../store";
+import {subscriptions} from "./data";
 
 import { removeFromList } from "../utils";
 

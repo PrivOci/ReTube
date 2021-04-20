@@ -43,7 +43,9 @@ const ChannelThumbnail = ({ item }) => {
         <p className="text-xs px-1 bg-gray-200 text-gray-800 rounded-full">
           {platform}
         </p>
-        <SubscribeButton channel_url={item.channelUrl} />
+      </a>
+      <SubscribeButton channel_url={item.channelUrl} />
+      <a href={`videolist?url=${item.channelUrl}`} alt="video source">
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>
       <p className="text-xs text-gray-600 hover:text-black dark:text-gray-400">

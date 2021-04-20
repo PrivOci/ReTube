@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useSnapshot } from "valtio";
 import { channelUrlDetails, removeFromList } from "../utils";
 
-import subscriptions from "../store";
+import { subscriptions } from "./data";
+
 // TODO: shared
 const YOUTUBE = "yt";
 const LBRY = "lb";

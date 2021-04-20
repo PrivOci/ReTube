@@ -1,6 +1,6 @@
 import { proxy } from "valtio";
 
-const subscriptions = proxy(
+export const subscriptions = proxy(
   JSON.parse(localStorage.getItem("subscriptions")) ?? {
     youtube: [],
     lbry: [],
@@ -8,4 +8,8 @@ const subscriptions = proxy(
   }
 );
 
-export default subscriptions;
+export const config = proxy(
+  JSON.parse(localStorage.getItem("config")) ?? {
+    spell_checker: false,
+  }
+);

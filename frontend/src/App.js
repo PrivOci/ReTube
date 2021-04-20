@@ -17,7 +17,8 @@ import { Route } from "react-router-dom";
 import { faFire, faNewspaper, faEdit } from "@fortawesome/free-solid-svg-icons";
 
 import { useSnapshot } from "valtio";
-import subscriptions from "./store";
+import { subscriptions } from "./Components/data";
+import { config } from "./Components/data";
 import JsonEdit from "./Components/JsonEdit";
 
 const pages = [
@@ -89,13 +90,15 @@ const ContentPages = [
 
 function App() {
   const location = useLocation();
-  const storeReadOnly = useSnapshot(subscriptions);
+  const subsReadOnly = useSnapshot(subscriptions);
+  const configReadOnly = useSnapshot(config);
 
   useEffect(() => {
     localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
-    console.log("subscriptions Changed");
+    localStorage.setItem("config", JSON.stringify(configReadOnly));
+    console.log("subscriptions/config changed");
     return () => {};
-  }, [storeReadOnly]);
+  }, [subsReadOnly, configReadOnly]);
 
   return (
     <div className="bg-gray-100 dark:bg-gray-600">

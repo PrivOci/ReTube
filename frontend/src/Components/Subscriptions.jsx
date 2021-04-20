@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import videoBoxes from "./SmallVideoBox";
 import fetchVideos from "../utils";
 import { useSnapshot } from "valtio";
-import subscriptions from "../store";
+import { subscriptions } from "./data";
 
 const isFromToday = (videoEntry) => {
   const oneDay = 24 * 60 * 60 * 1000;
