@@ -98,7 +98,7 @@ const fetchVideos = async (url) => {
     response.json()
   );
   // console.log("video list rec data:");
-  console.log(data);
+  // console.log(data);
   if (data.ready === false) {
     console.log("failed to get videos");
     return;
