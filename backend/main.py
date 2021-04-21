@@ -175,6 +175,7 @@ async def get_youtube_videos_source(details: dict) -> dict:
             datetime.fromisoformat(entry["published"]).timetuple())) * 1000
 
         video_entry["videoUrl"] = entry["link"]["@href"]
+        video_entry["channelUrl"] = f"https://www.youtube.com/channel/{entry['yt:channelId']}"
         video_entry["platform"] = YOUTUBE
         video_entries.append(video_entry)
     data_dict["content"] = video_entries

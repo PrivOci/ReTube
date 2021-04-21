@@ -20,11 +20,11 @@ const VideoThumbnail = ({ item }) => {
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>
 
-      {/* <a href={`videolist?url=${item.channelUrl}`} alt="channel"> */}
-      <p className="text-xs text-gray-600 hover:text-black dark:text-gray-400">
-        {item.channel}
-      </p>
-      {/* </a> */}
+      <a href={`videolist?url=${item.channelUrl}`} alt="channel">
+        <p className="text-xs text-gray-600 hover:text-black dark:text-gray-400">
+          {item.channel}
+        </p>
+      </a>
     </div>
   );
 };
