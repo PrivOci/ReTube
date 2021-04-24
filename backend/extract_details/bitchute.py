@@ -207,7 +207,7 @@ async def get_bitchute_popular():
             block.find("span", {"class": "video-duration"}).text.strip())
 
         video_entry["createdAt"] = dateparser.parse(block.find(
-            "p", {"class": "video-card-published"}).text.strip()).timetuple()
+            "p", {"class": "video-card-published"}).text.strip()).timestamp() * 1000
         video_entry["videoUrl"] = "https://bitchute.com" + \
             block.find("a", href=True)["href"].strip()
         video_entry["platform"] = BITCHUTE

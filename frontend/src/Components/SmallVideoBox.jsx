@@ -1,5 +1,5 @@
 import React from "react";
-import { platforms, humanizeDurationSec } from "../utils";
+import { platforms, humanizeDurationSec, timeSince } from "../utils";
 import Skeleton from "./Skeleton";
 import SubscribeButton from "./SubscribeButton";
 
@@ -15,6 +15,9 @@ const VideoThumbnail = ({ item }) => {
             alt="thumbnail"
             className="object-center rounded-xl mb-1 transition duration-300 ease-in-out hover:opacity-75"
           />
+          <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute left-2 bottom-2 bg-opacity-50">
+            {`${timeSince(item.createdAt)} ago`}
+          </span>
           <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute right-2 bottom-2 bg-opacity-50">
             {humanizeDurationSec(item.duration)}
           </span>
