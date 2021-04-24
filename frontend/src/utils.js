@@ -1,4 +1,5 @@
 import _ from "lodash";
+import humanizeDuration from "humanize-duration";
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -20,6 +21,21 @@ const YOUTUBE = "yt";
 const LBRY = "lb";
 const BITCHUTE = "bc";
 
+const shortEnglishHumanizer = humanizeDuration.humanizer({
+  language: "shortEn",
+  languages: {
+    shortEn: {
+      d: () => "",
+      h: () => "",
+      m: () => "",
+      s: () => "",
+    },
+  },
+  delimiter: ":",
+  spacer: "",
+  round: true,
+});
+
 export const platforms = {
   yt: "YouTube",
   lb: "Lbry",
@@ -30,6 +46,11 @@ export const removeFromList = (myList, item) => {
   _.remove(myList, (i) => {
     return i === item;
   });
+};
+
+export const humanizeDurationSec = (sec) => {
+  const msec = sec * 1000;
+  return shortEnglishHumanizer(msec);
 };
 
 export const videoUrlDetails = (url) => {
@@ -83,7 +104,7 @@ export const channelUrlDetails = (url) => {
   return details;
 };
 
-const fetchVideos = async (url) => {
+export const fetchVideos = async (url) => {
   let [platform, id, api_url] = channelUrlDetails(url);
 
   const requestOptions = {
@@ -201,4 +222,35 @@ export const fetchSearchResults = async (search_query) => {
   return allSearch;
 };
 
-export default fetchVideos;
+
+export const timeSince = (timestamp) => {
+  const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+
+  let interval = Math.floor(seconds / 31536000);
+
+  if (interval > 1) {
+    return interval + " years";
+  }
+
+  interval = Math.floor(seconds / 2592000);
+  if (interval > 1) {
+    return interval + " months";
+  }
+
+  interval = Math.floor(seconds / 86400);
+  if (interval > 1) {
+    return interval + " days";
+  }
+
+  interval = Math.floor(seconds / 3600);
+  if (interval > 1) {
+    return interval + " hours";
+  }
+
+  interval = Math.floor(seconds / 60);
+  if (interval > 1) {
+    return interval + " minutes";
+  }
+
+  return Math.floor(seconds) + " seconds";
+};

@@ -20,7 +20,7 @@ const Bar = () => {
             />
             <button
               type="submit"
-              formAction="videolist"
+              formAction="VideoBoard"
               className="ml-1 outline-none focus:outline-none active:outline-none"
             >
               <svg

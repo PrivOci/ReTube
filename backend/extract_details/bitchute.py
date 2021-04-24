@@ -1,10 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
+import dateparser
+from utils import get_xml_stream_as_json
+import time
+from datetime import datetime
+import email.utils
+import re
 
 BITCHUTE = "bc"
-
-
+BITCHUTE_XML = "https://www.bitchute.com/feeds/rss/channel/"
 
 
 def bitchute_video_details(video_url) -> dict:
@@ -43,21 +48,28 @@ def bitchute_video_details(video_url) -> dict:
         'https://www.bitchute.com/video/6uhZnVIkzWyr/counts/', headers=headers, data=data)
     count_json = count_req.json()
 
+    publish_date = soup.find(
+        "div", {"class": "video-publish-date"}).text.strip()
+    splited_date = publish_date.split(" on ")[1].split()
+    date_result = f"{splited_date[0]} {re.sub('[^0-9]','', splited_date[1])} {splited_date[2]}"
+    publish_date = datetime.strptime(date_result, '%B %d %Y.').timestamp()
+
     video_details = {
         "id": video_url.split("/video/")[1].strip().strip('/'),
         "title": soup.find("h1", {"id": "video-title"}).text,
         "description": soup.find("meta", {"name": "description"})["content"],
         "author": soup.find("p", {"class": "video-card-channel"}).a.text,
-        "channel_url": "https://bitchute.com" +
+        "channelUrl": "https://bitchute.com" +
         soup.find("p", {"class": "video-card-channel"}).a["href"],
         "duration": "",
-        "view_count": count_json["view_count"],
+        "viewCount": count_json["view_count"],
         "average_rating": "",
-        "like_count": count_json["like_count"],
-        "dislike_count": count_json["dislike_count"],
-        "subscriber_count": count_json["subscriber_count"],
+        "likeCount": count_json["like_count"],
+        "dislikeCount": count_json["dislike_count"],
+        "subscriberCount": count_json["subscriber_count"],
         "thumbnail": soup.find("video", {"id": "player"})["poster"],
-        "stream_url": soup.find("video", {"id": "player"}).source["src"],
+        "createdAt": int(publish_date) * 1000,
+        "streamUrl": soup.find("video", {"id": "player"}).source["src"],
     }
     return video_details
 
@@ -129,5 +141,79 @@ async def bitchute_search_video(search_query):
 
     data_dict["content"] = video_entries
     data_dict["ready"] = True
+
+    return data_dict
+
+
+async def get_bitchute_channel_source(details: dict) -> dict:
+    if details['id'] == "popular":
+        return await get_bitchute_popular()
+    data_dict = {}
+    data_dict["platform"] = BITCHUTE
+    popular_rss_url = f"{BITCHUTE_XML}{details['id']}"
+    content = await get_xml_stream_as_json(popular_rss_url)
+    video_entries = []
+    for entry in content["rss"]["channel"]["item"]:
+        video_entry = {}
+        video_entry["thumbSrc"] = entry["enclosure"]["@url"]
+        video_entry["title"] = entry["title"]
+        video_entry["channel"] = details['id']
+        video_entry["views"] = ""
+        video_entry["createdAt"] = int(time.mktime(
+            email.utils.parsedate(entry["pubDate"]))) * 1000
+        video_entry[
+            "videoUrl"] = f"https://www.bitchute.com/video/{entry['link'].split('/embed/')[1]}"
+        video_entry["platform"] = BITCHUTE
+        video_entries.append(video_entry)
+
+    data_dict["ready"] = True
+    data_dict["content"] = video_entries
+    return data_dict
+
+
+def parsed_time_to_seconds(human_time):
+    time_parts = human_time.split(":")
+    sum = 0
+    for count, part in enumerate(reversed(time_parts)):
+        part = int(part)
+        sum += part if count == 0 else part * pow(60, count)
+    return sum
+
+
+# Parse Bitchute "listing-popular" section
+async def get_bitchute_popular():
+    data_dict = {}
+    data_dict["ready"] = False
+    data_dict["platform"] = BITCHUTE
+    target_url = "https://www.bitchute.com"
+    res = requests.get(target_url)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    content_section = soup.find("div", {"id": "listing-popular"}).div
+
+    video_entries = []
+    for block in content_section:
+        video_entry = {}
+        if not hasattr(block, 'div'):
+            continue
+
+        video_entry["thumbSrc"] = block.find("img", src=True)[
+            "data-src"].strip()
+
+        video_entry["title"] = block.find(
+            "p", {"class": "video-card-title"}).a.text.strip()
+        video_entry["channel"] = block.find(
+            "p", {"class": "video-card-channel"}).a.text.strip()
+        video_entry["duration"] = parsed_time_to_seconds(
+            block.find("span", {"class": "video-duration"}).text.strip())
+
+        video_entry["createdAt"] = dateparser.parse(block.find(
+            "p", {"class": "video-card-published"}).text.strip()).timetuple()
+        video_entry["videoUrl"] = "https://bitchute.com" + \
+            block.find("a", href=True)["href"].strip()
+        video_entry["platform"] = BITCHUTE
+        video_entries.append(video_entry)
+
+    data_dict["ready"] = True
+    data_dict["content"] = video_entries
 
     return data_dict

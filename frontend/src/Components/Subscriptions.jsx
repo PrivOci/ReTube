@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import videoBoxes from "./SmallVideoBox";
-import fetchVideos from "../utils";
+import { fetchVideos } from "../utils";
 import { useSnapshot } from "valtio";
 import { subscriptions } from "./data";
 

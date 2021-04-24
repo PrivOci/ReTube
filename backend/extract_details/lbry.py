@@ -126,6 +126,7 @@ def _parse_lbry_details(entry) -> dict:
         else:
             video_entry["channel"] = entry["signing_channel"]["value"].get(
                 "title", entry["signing_channel"]["name"])
+        video_entry["duration"] =  entry["value"]["video"]["duration"]
         video_entry["views"] = ""
         video_entry["createdAt"] = int(entry["timestamp"]) * 1000
         video_entry["videoUrl"] = lbry_to_normal_url(entry["canonical_url"])
@@ -150,16 +151,17 @@ def lbry_video_details(video_url):
             "description", ""),
         "author": json_details["signing_channel"]["value"].get(
             "title", json_details["signing_channel"]["name"]),
-        "channel_url":
+        "channelUrl":
             json_details["signing_channel"]["short_url"].replace(
                 "lbry://", "https://odysee.com/").replace("#", ":"),
         "duration": json_details["value"]["video"]["duration"],
-        "view_count": view_count,
-        "average_rating": "",
-        "like_count": "",
-        "dislike_count": "",
+        "viewCount": view_count,
+        "averageRating": "",
+        "likeCount": "",
+        "dislikeCount": "",
         "thumbnail": json_details["value"]["thumbnail"]["url"],
-        "stream_url": video_url,
+        "createdAt":int(json_details["timestamp"]) * 1000,
+        "streamUrl": video_url,
     }
     return video_details
 
@@ -176,7 +178,7 @@ def get_view_count(claim_id):
         f'https://api.lbry.com/file/view_count?auth_token={auth_token}&claim_id={claim_id}', headers=_headers)
     data = response.json()
     if "success" in data and data["success"] == True:
-        return data["data"]
+        return data["data"][0]
     else:
         return 0
 

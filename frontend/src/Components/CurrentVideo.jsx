@@ -48,8 +48,8 @@ const VideoPage = ({ location }) => {
 
   const videoProps = {
     controls: true,
-    url: data ? data.stream_url : null,
-    light: data ? data.thumbnail_url : null,
+    url: data ? data.streamUrl : null,
+    light: data ? data.thumbnailUrl : null,
     // https://github.com/CookPete/react-player#props
   };
 

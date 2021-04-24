@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import VideoList from "./Components/VideoList";
+import VideoBoard from "./Components/VideoBoard";
 import VideoPage from "./Components/CurrentVideo";
 import { useLocation, Redirect } from "react-router-dom";
 
@@ -25,8 +25,8 @@ const pages = [
   {
     name: "Popular",
     faIcon: faFire,
-    path: "/videolist?url=popular",
-    component: VideoList,
+    path: "/VideoBoard?url=popular",
+    component: VideoBoard,
   },
   {
     name: "Subscriptions",
@@ -44,27 +44,27 @@ const pages = [
   // {
   //   name: "YT Popular",
   //   faIcon: faFire,
-  //   path: "/videolist?url=yt_popular",
-  //   component: VideoList,
+  //   path: "/VideoBoard?url=yt_popular",
+  //   component: VideoBoard,
   // },
   // {
   //   name: "Lbry Popular",
   //   faIcon: faFire,
-  //   path: "/videolist?url=lbry_popular",
-  //   component: VideoList,
+  //   path: "/VideoBoard?url=lbry_popular",
+  //   component: VideoBoard,
   // },
   // {
   //   name: "BitChute Popular",
   //   faIcon: faFire,
-  //   path: "/videolist?url=bitchute_popular",
-  //   component: VideoList,
+  //   path: "/VideoBoard?url=bitchute_popular",
+  //   component: VideoBoard,
   // },
 ];
 
 const ContentPages = [
   {
-    path: "/videolist",
-    component: VideoList,
+    path: "/VideoBoard",
+    component: VideoBoard,
   },
   {
     path: "/watch",
@@ -108,7 +108,7 @@ function App() {
           <Sidebar pages={pages} location={location} />
           <Content>
             <Route exact path="/">
-              <Redirect to="/videolist?url=popular" />
+              <Redirect to="/VideoBoard?url=popular" />
             </Route>
             {ContentPages.map((page, index) => {
               return (

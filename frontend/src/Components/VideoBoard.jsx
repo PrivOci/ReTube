@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 
 import videoBoxes from "./SmallVideoBox";
 
-import fetchVideos, { fetchPopularVideos, fetchSearchResults } from "../utils";
+import { fetchVideos, fetchPopularVideos, fetchSearchResults } from "../utils";
 
 import useSWR from "swr";
 
@@ -19,7 +19,7 @@ const fetchDataSWR = async (url_search) => {
   }
 };
 
-function VideoList({ location }) {
+function VideoBoard({ location }) {
   const CurrentLocation = useLocation();
 
   console.log(location);
@@ -39,7 +39,7 @@ function VideoList({ location }) {
           {`Do you mean: `}
           <span>
             <a
-              href={`videolist?search=${data.suggestion}`}
+              href={`VideoBoard?search=${data.suggestion}`}
               alt="search"
               className="hover:underline text-blue-400 hover:text-blue-500"
             >
@@ -62,4 +62,4 @@ function VideoList({ location }) {
   );
 }
 
-export default VideoList;
+export default VideoBoard;

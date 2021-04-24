@@ -1,7 +1,7 @@
 import youtube_dl as yt
-from extract_details.bitchute import bitchute_video_details, bitchute_search_video
+from extract_details.bitchute import bitchute_video_details, bitchute_search_video, get_bitchute_channel_source
 from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details, lbry_channel_search
-from extract_details.youtube import youtube_search_videos, youtube_video_details, youtube_channel_search
+from extract_details.youtube import youtube_search_videos, youtube_video_details, youtube_channel_search, get_youtube_videos_source
 from spelling import ginger_check_sentence
 
 from fastapi import FastAPI
@@ -12,19 +12,12 @@ import uvicorn
 from pydantic import BaseModel
 
 import requests
-import xmltodict
-
 from bs4 import BeautifulSoup
 
 import optimize
 
-import email.utils
-from datetime import datetime
-import dateparser
-import time
 
 app = FastAPI()
-
 
 # optimize.DISABLE_CACHE = True
 
@@ -36,9 +29,6 @@ origins = [
     "http://127.0.0.1",
     "*",
 ]
-
-YOUTUBE_XML = "https://www.youtube.com/feeds/videos.xml"
-BITCHUTE_XML = "https://www.bitchute.com/feeds/rss/channel/"
 
 app.add_middleware(
     CORSMiddleware,
@@ -62,6 +52,7 @@ class request_details(BaseModel):
 class search_query(BaseModel):
     query: str
     max: int
+
 
 class just_string(BaseModel):
     query: str
@@ -114,14 +105,14 @@ async def get_video_from_source(details: dict) -> dict:
                 "description": f"{meta['description']}",
                 "author": f"{meta['uploader']}",
                 "duration": f"{meta['duration']}",
-                "view_count": f"{meta['view_count']}",
-                "average_rating": f"{meta['average_rating']}" if "average_rating" in meta else "",
-                "like_count": f"{meta['like_count']}" if "like_count" in meta else "",
-                "dislike_count": f"{meta['dislike_count']}" if "dislike_count" in meta else "",
+                "viewCount": int(meta['view_count']),
+                "averageRating": f"{meta['average_rating']}" if "average_rating" in meta else "",
+                "likeCount": f"{meta['like_count']}" if "like_count" in meta else "",
+                "dislikeCount": f"{meta['dislike_count']}" if "dislike_count" in meta else "",
                 "title": f"{meta['title']}",
                 "thumbnail": f"{meta['thumbnail']}",
-                "stream_url": f"{meta['url']}",
-                "channel_url": f"{meta['channel_url']}",
+                "streamUrl": f"{meta['url']}",
+                "channelUrl": f"{meta['channel_url']}",
             }
         result['ready'] = True
         result["platform"] = YOUTUBE
@@ -150,37 +141,6 @@ async def get_youtube_channel(details: request_details) -> dict:
         dict(details),
         get_youtube_videos_source,
         1)
-
-
-async def get_youtube_videos_source(details: dict) -> dict:
-    data_dict = {}
-    data_dict["platform"] = YOUTUBE
-    yt_type = "?playlist_id=" if details.get(
-        "playlist") == True else "?channel_id="
-    popular_rss_url = f"{YOUTUBE_XML}{yt_type}{details['id']}"
-    content = await get_xml_stream_as_json(popular_rss_url)
-    video_entries = []
-    content_list = []
-    if not isinstance(content["feed"]["entry"], list):
-        content_list.append(content["feed"]["entry"])
-    else:
-        content_list = content["feed"]["entry"]
-    for entry in content_list:
-        video_entry = {}
-        video_entry["thumbSrc"] = entry["media:group"]["media:thumbnail"]["@url"]
-        video_entry["title"] = entry["title"]
-        video_entry["channel"] = entry["author"]["name"]
-        video_entry["views"] = entry["media:group"]["media:community"]["media:statistics"]["@views"]
-        video_entry["createdAt"] = int(time.mktime(
-            datetime.fromisoformat(entry["published"]).timetuple())) * 1000
-
-        video_entry["videoUrl"] = entry["link"]["@href"]
-        video_entry["channelUrl"] = f"https://www.youtube.com/channel/{entry['yt:channelId']}"
-        video_entry["platform"] = YOUTUBE
-        video_entries.append(video_entry)
-    data_dict["content"] = video_entries
-    data_dict["ready"] = True
-    return data_dict
 
 
 # YouTube playlist to JSON
@@ -287,73 +247,6 @@ async def get_bitchute_channel(details: request_details):
         dict(details),
         get_bitchute_channel_source,
         1)
-
-
-async def get_bitchute_channel_source(details: dict) -> dict:
-    if details['id'] == "popular":
-        return await get_bitchute_popular()
-    data_dict = {}
-    data_dict["platform"] = BITCHUTE
-    popular_rss_url = f"{BITCHUTE_XML}{details['id']}"
-    content = await get_xml_stream_as_json(popular_rss_url)
-    video_entries = []
-    for entry in content["rss"]["channel"]["item"]:
-        video_entry = {}
-        video_entry["thumbSrc"] = entry["enclosure"]["@url"]
-        video_entry["title"] = entry["title"]
-        video_entry["channel"] = details['id']
-        video_entry["views"] = ""
-        video_entry["createdAt"] = int(time.mktime(
-            email.utils.parsedate(entry["pubDate"]))) * 1000
-        video_entry[
-            "videoUrl"] = f"https://www.bitchute.com/video/{entry['link'].split('/embed/')[1]}"
-        video_entry["platform"] = BITCHUTE
-        video_entries.append(video_entry)
-
-    data_dict["ready"] = True
-    data_dict["content"] = video_entries
-    return data_dict
-
-
-# Parse Bitchute "listing-popular" section
-async def get_bitchute_popular():
-    data_dict = {}
-    data_dict["ready"] = False
-    data_dict["platform"] = BITCHUTE
-    target_url = "https://www.bitchute.com"
-    res = requests.get(target_url)
-    soup = BeautifulSoup(res.text, 'html.parser')
-    content_section = soup.find("div", {"id": "listing-popular"}).div
-
-    video_entries = []
-    for block in content_section:
-        video_entry = {}
-        if not hasattr(block, 'div'):
-            continue
-
-        video_entry["thumbSrc"] = block.find("img", src=True)[
-            "data-src"].strip()
-
-        video_entry["title"] = block.find(
-            "p", {"class": "video-card-title"}).a.text.strip()
-        video_entry["channel"] = block.find(
-            "p", {"class": "video-card-channel"}).a.text.strip()
-        video_entry["createdAt"] = dateparser.parse(block.find(
-            "p", {"class": "video-card-published"}).text.strip()).timetuple()
-        video_entry["videoUrl"] = "https://bitchute.com" + \
-            block.find("a", href=True)["href"].strip()
-        video_entry["platform"] = BITCHUTE
-        video_entries.append(video_entry)
-
-    data_dict["ready"] = True
-    data_dict["content"] = video_entries
-
-    return data_dict
-
-
-async def get_xml_stream_as_json(xml_url):
-    req = requests.get(xml_url)
-    return xmltodict.parse(req.text)
 
 
 if __name__ == "__main__":
