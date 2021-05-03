@@ -128,8 +128,7 @@ export const fetchVideos = async (url) => {
   const data = await fetch(api_url, requestOptions).then((response) =>
     response.json()
   );
-  // console.log("video list rec data:");
-  // console.log(data);
+
   if (data.ready === false) {
     console.log("failed to get videos");
     return;

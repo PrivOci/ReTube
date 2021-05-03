@@ -5,9 +5,20 @@ import SubscribeButton from "./SubscribeButton";
 import { platforms, timeSince } from "../utils";
 import { Link } from "react-router-dom";
 
-import useSWR from 'swr'
+import useSWR from "swr";
 import { fetchDataSWR } from "../utils";
 
+const descriptionBox = (description) => {
+  if (description) {
+    return (
+      <div className="shadow-lg justify-center rounded-2xl p-4 mt-2 bg-white dark:bg-gray-700 w-full text-black dark:text-white">
+        <div className="whitespace-pre-line">{description}</div>
+      </div>
+    );
+  } else {
+    return <span />;
+  }
+};
 
 const VideoPlayer = ({ videoProps, details, platform, url }) => {
   const platformName = platforms[platform];
@@ -62,10 +73,9 @@ const VideoPlayer = ({ videoProps, details, platform, url }) => {
           </div>
         </div>
       </div>
+      
+      {descriptionBox(details.description)}
 
-      <div className="shadow-lg justify-center rounded-2xl p-4 mt-2 bg-white dark:bg-gray-700 w-full text-black dark:text-white">
-        <div className="whitespace-pre-line">{details.description}</div>
-      </div>
     </div>
   );
 };
