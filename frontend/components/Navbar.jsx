@@ -1,6 +1,6 @@
 import React from "react";
 
-const Bar = () => {
+const Navbar = () => {
   return (
     <div className="flex flex-col sm:flex-row sm:h-20 px-6 mb-1 rounded-2xl bg-white dark:bg-gray-700 relative z-50">
       <div className="h-20 w-full flex items-center justify-between sm:h-auto">
@@ -20,7 +20,7 @@ const Bar = () => {
             />
             <button
               type="submit"
-              formAction="VideoBoard"
+              formAction="search"
               className="ml-1 outline-none focus:outline-none active:outline-none"
             >
               <svg
@@ -42,4 +42,4 @@ const Bar = () => {
   );
 };
 
-export default Bar;
+export default Navbar;

@@ -65,6 +65,7 @@ const SubscribeButton = ({ channel_url, count }) => {
           default:
             return false;
         }
+        localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
       }}
     >
       {isSubscribed ? `Unsubscribe [${count}]` : `Subscribe [${count}]`}

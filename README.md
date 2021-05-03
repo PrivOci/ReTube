@@ -9,12 +9,13 @@ Subscriptions are saved locally in [`LocalStorage`](https://javascript.info/loca
 
 # Development
 I'm not a web developer and this one is my first project, if you like the idea please contribute, any kind of feedback is welcome. \
-The frontend is build using [`ReactJS`](https://reactjs.org) with [`Tailwinds`](https://tailwindcss.com). \
+The frontend is build using [`NextJS`](https://nextjs.org) with [`Tailwinds`](https://tailwindcss.com). \
 The backend uses [`FastApi`](https://fastapi.tiangolo.com) and [`Redis`](https://redis.io).
 
 I chose them because they are very simple and easy-to-use.
 
-# Docker
+# Setup local instance:
+## Docker
 `git clone https://github.com/PrivOci/ReTube` \
 `cd ReTube` \
 `docker-compose up -d`
@@ -39,4 +40,4 @@ API docs: `http://localhost:8000/docs`
 # Frontend
 `cd frontend` \
 `yarn` \
-`yarn start`
+`yarn dev run`

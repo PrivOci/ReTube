@@ -1,12 +1,14 @@
 import React from "react";
 import ReactPlayer from "react-player";
-// import Draggable from "react-draggable";
-import SubscribeButton from "./SubscribeButton";
 import { platforms, timeSince } from "../utils";
-import { Link } from "react-router-dom";
-
+// import { Link } from "next/link";
 import useSWR from "swr";
 import { fetchDataSWR } from "../utils";
+
+import dynamic from "next/dynamic";
+const SubscribeButton = dynamic(() => import("./SubscribeButton"), {
+  ssr: false,
+});
 
 const descriptionBox = (description) => {
   if (description) {
@@ -16,15 +18,14 @@ const descriptionBox = (description) => {
       </div>
     );
   } else {
-    return <span />;
+    return <div />;
   }
 };
 
-const VideoPlayer = ({ videoProps, details, platform, url }) => {
+const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
   const platformName = platforms[platform];
-  console.log(details);
 
-  // prefetch channel
+  // prefetch channel since next/link not working here
   useSWR([details.channelUrl, undefined], fetchDataSWR);
 
   return (
@@ -38,9 +39,9 @@ const VideoPlayer = ({ videoProps, details, platform, url }) => {
             {details.title}
           </h3>
           <p className="font-medium text-gray-600 dark:text-gray-300 hover:text-gray-400">
-            <Link to={`/VideoBoard?url=${details.channelUrl}`}>
+            <a href={`/channel?url=${details.channelUrl}`}>
               {details.author}
-            </Link>
+            </a>
           </p>
           <div className="flex items-center text-gray-500 dark:text-gray-400 text-md my-2 md:m-0">
             <svg
@@ -66,16 +67,14 @@ const VideoPlayer = ({ videoProps, details, platform, url }) => {
             />
             <button
               className="items-center shadow bg-red-500 mt-2 px-4 py-2 text-white hover:bg-red-400 rounded-lg"
-              onClick={() => window.open(url, "_blank")}
+              onClick={() => window.open(originalUrl, "_blank")}
             >
               Watch On {platformName}
             </button>
           </div>
         </div>
       </div>
-      
       {descriptionBox(details.description)}
-
     </div>
   );
 };

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import videoBoxes from "./SmallVideoBox";
 import { fetchVideos } from "../utils";
-import { useSnapshot } from "valtio";
-import { subscriptions } from "./data";
+import { snapshot } from "valtio";
 
 const isFromToday = (videoEntry) => {
   const oneDay = 24 * 60 * 60 * 1000;
@@ -60,15 +59,18 @@ const fetchSubsVideos = async (subsStore, setVideoDataState) => {
 
 const Subscriptions = () => {
   let [videoData, setVideoDataState] = useState();
-  let subsStore = useSnapshot(subscriptions);
 
   useEffect(() => {
+    const proxy_data = require("./data");
+    let subsStore = snapshot(proxy_data.subscriptions);
+    localStorage.setItem("subscriptions", JSON.stringify(proxy_data.subscriptions));
+
     fetchSubsVideos(subsStore, setVideoDataState);
 
     return () => {
       setVideoDataState([]);
     };
-  }, [subsStore]);
+  }, []);
 
   return (
     <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">

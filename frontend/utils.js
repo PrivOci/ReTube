@@ -54,7 +54,7 @@ export const humanizeDurationSec = (sec) => {
 };
 
 export const videoUrlDetails = (url) => {
-  console.log(url);
+  // console.log(url);
   let details = [];
   if (url.includes("youtube.com")) {
     details[0] = YOUTUBE;
@@ -71,7 +71,7 @@ export const videoUrlDetails = (url) => {
 };
 
 export const fetchDataSWR = async (url, search) => {
-  if (url === "popular") {
+  if (url === "/popular") {
     return fetchPopularVideos();
   } else if (search) {
     return fetchSearchResults(decodeURI(search));
@@ -138,6 +138,7 @@ export const fetchVideos = async (url) => {
 };
 
 export const fetchPopularVideos = async () => {
+  console.log("fetchPopularVideos");
   const ytPromise = fetchVideos("yt_popular");
   const lbPromise = fetchVideos("lbry_popular");
   const bcPromise = fetchVideos("bitchute_popular");
@@ -153,6 +154,7 @@ export const fetchPopularVideos = async () => {
     .concat((await bcPromise).content.slice(1, 10));
 
   allPopular.ready = true;
+  console.log(allPopular);
   return allPopular;
 };
 
@@ -174,8 +176,9 @@ const fetchSearchAPi = async (search_api_url, search_query) => {
 };
 
 const is_spell_checker_enabled = () => {
-  const config = JSON.parse(localStorage.getItem("config"));
-  return config["spell_checker"];
+  // const config = JSON.parse(localStorage.getItem("config"));
+  // return config["spell_checker"];
+  return false;
 };
 
 const check_sentence = async (str) => {
@@ -199,6 +202,7 @@ const check_sentence = async (str) => {
 };
 
 export const fetchSearchResults = async (search_query) => {
+  console.log(`searching: ${search_query}`);
   const check_query = check_sentence(search_query);
 
   let allWait = [];
@@ -227,7 +231,7 @@ export const fetchSearchResults = async (search_query) => {
   if (check_result.need_change) {
     allSearch.suggestion = check_result.result;
   }
-  // console.log(check_result);
+
   return allSearch;
 };
 

@@ -1,5 +1,6 @@
 module.exports = {
-  purge: [],
+  mode: 'jit',
+  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'media', // or 'media' or 'class'
   i18n: {
     locales: ["en-US"],

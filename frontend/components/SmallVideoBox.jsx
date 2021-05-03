@@ -1,11 +1,16 @@
 import React from "react";
 import { platforms, humanizeDurationSec, timeSince } from "../utils";
 import Skeleton from "./Skeleton";
-import SubscribeButton from "./SubscribeButton";
+
+import dynamic from 'next/dynamic'
+const SubscribeButton = dynamic(
+  () => import("./SubscribeButton"),
+  { ssr: false }
+);
 
 const VideoThumbnail = ({ item }) => {
   const platform = platforms[item.platform];
-  console.log(item);
+
   return (
     <div className="each mb-10 m-2 inline-block align-middle">
       <a href={`/watch?url=${item.videoUrl}`} alt="video source">
@@ -38,10 +43,10 @@ const VideoThumbnail = ({ item }) => {
 
 const ChannelThumbnail = ({ item }) => {
   const platform = platforms[item.platform];
-  // console.log(item);
+
   return (
     <div className="each mb-10 m-2 inline-block align-middle">
-      <a href={`VideoBoard?url=${item.channelUrl}`} alt="video source">
+      <a href={`channel?url=${item.channelUrl}`} alt="video source">
         <img
           src={item.thumbSrc}
           alt="thumbnail"
@@ -52,7 +57,7 @@ const ChannelThumbnail = ({ item }) => {
         </p>
       </a>
       <SubscribeButton channel_url={item.channelUrl} />
-      <a href={`VideoBoard?url=${item.channelUrl}`} alt="video source">
+      <a href={`channel?url=${item.channelUrl}`} alt="video source">
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>
       <p className="text-xs text-gray-600 hover:text-black dark:text-gray-400">

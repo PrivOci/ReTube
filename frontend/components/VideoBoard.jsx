@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useRouter } from "next/router";
 
 import videoBoxes from "./SmallVideoBox";
 
@@ -7,18 +7,14 @@ import {fetchDataSWR } from "../utils";
 
 import useSWR from "swr";
 
-function VideoBoard({ location }) {
-  const CurrentLocation = useLocation();
+function VideoBoard() {
+  const router = useRouter();
+  console.log(router);
 
-  console.log(location);
-  let url = CurrentLocation.state
-    ? CurrentLocation.state.url
-    : location.search.split("url=")[1];
-  url = decodeURI(url);
+  let targetUrl = router.asPath;
+  let search = targetUrl.split("search=")[1];
 
-  let search = location.search.split("search=")[1];
-
-  const { data, error } = useSWR([url, search], fetchDataSWR);
+  const { data, error } = useSWR([targetUrl, search], fetchDataSWR);
 
   return (
     <div>
@@ -40,7 +36,6 @@ function VideoBoard({ location }) {
       )}
 
       <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-        {/* TODO: sub-header: channel info / search query */}
         {(error || !data || !data.content || !data.content.length
           ? Array.from(new Array(3))
           : data.content

@@ -1,5 +1,6 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+
+import { useRouter } from "next/router";
 import useSWR from "swr";
 
 import Skeleton from "./Skeleton";
@@ -32,18 +33,13 @@ const fetchVideoMetaSWR = async (platform_id) => {
     });
 };
 
-const VideoPage = ({ location }) => {
-  const CurrentLocation = useLocation();
+const Watch = () => {
+  const router = useRouter();
 
-  let url = CurrentLocation.state
-    ? CurrentLocation.state.url
-    : location.search.split("url=")[1];
-  url = decodeURI(url);
-
-  let [platform, id] = videoUrlDetails(url);
+  let targetUrl = router.asPath.split("url=")[1];
+  let [platform, id] = videoUrlDetails(targetUrl);
 
   console.log(`watch: p:${platform} id:${id}`);
-
   const { data } = useSWR(JSON.stringify({ platform, id }), fetchVideoMetaSWR);
 
   const videoProps = {
@@ -52,7 +48,6 @@ const VideoPage = ({ location }) => {
     light: data ? data.thumbnailUrl : null,
     // https://github.com/CookPete/react-player#props
   };
-
   return (
     <div className="container mx-auto">
       {!data || !videoProps.url ? (
@@ -65,7 +60,7 @@ const VideoPage = ({ location }) => {
             videoProps={videoProps}
             details={data}
             platform={platform}
-            url={url}
+            url={targetUrl}
           />
         </div>
       )}
@@ -73,4 +68,4 @@ const VideoPage = ({ location }) => {
   );
 };
 
-export default VideoPage;
+export default Watch;
