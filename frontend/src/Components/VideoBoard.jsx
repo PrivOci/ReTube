@@ -3,21 +3,9 @@ import { useLocation } from "react-router-dom";
 
 import videoBoxes from "./SmallVideoBox";
 
-import { fetchVideos, fetchPopularVideos, fetchSearchResults } from "../utils";
+import {fetchDataSWR } from "../utils";
 
 import useSWR from "swr";
-
-const fetchDataSWR = async (url_search) => {
-  const { url, search } = JSON.parse(url_search);
-
-  if (url === "popular") {
-    return fetchPopularVideos();
-  } else if (search) {
-    return fetchSearchResults(decodeURI(search));
-  } else {
-    return fetchVideos(url);
-  }
-};
 
 function VideoBoard({ location }) {
   const CurrentLocation = useLocation();
@@ -30,7 +18,7 @@ function VideoBoard({ location }) {
 
   let search = location.search.split("search=")[1];
 
-  const { data, error } = useSWR(JSON.stringify({ url, search }), fetchDataSWR);
+  const { data, error } = useSWR([url, search], fetchDataSWR);
 
   return (
     <div>

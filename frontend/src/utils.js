@@ -70,6 +70,16 @@ export const videoUrlDetails = (url) => {
   return details;
 };
 
+export const fetchDataSWR = async (url, search) => {
+  if (url === "popular") {
+    return fetchPopularVideos();
+  } else if (search) {
+    return fetchSearchResults(decodeURI(search));
+  } else {
+    return fetchVideos(url);
+  }
+};
+
 export const channelUrlDetails = (url) => {
   let details = [];
   if (url === "yt_popular") {

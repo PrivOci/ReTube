@@ -5,9 +5,17 @@ import SubscribeButton from "./SubscribeButton";
 import { platforms, timeSince } from "../utils";
 import { Link } from "react-router-dom";
 
+import useSWR from 'swr'
+import { fetchDataSWR } from "../utils";
+
+
 const VideoPlayer = ({ videoProps, details, platform, url }) => {
   const platformName = platforms[platform];
   console.log(details);
+
+  // prefetch channel
+  useSWR([details.channelUrl, undefined], fetchDataSWR);
+
   return (
     <div className="grid grid-cols-1">
       <div className="shadow-lg justify-center rounded-2xl p-4 bg-white dark:bg-gray-700 w-full">

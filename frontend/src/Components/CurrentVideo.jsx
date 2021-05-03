@@ -54,7 +54,7 @@ const VideoPage = ({ location }) => {
   };
 
   return (
-    <div className="flex justify-center">
+    <div className="container mx-auto">
       {!data || !videoProps.url ? (
         <div className="w-1/2 justify-center">
           <Skeleton />
