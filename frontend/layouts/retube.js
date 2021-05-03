@@ -2,7 +2,7 @@ import Head from "next/head";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Content from "../components/Content";
-import Footer from "../components/Footer";
+// import Footer from "../components/Footer";
 
 export default function Layout({ children }) {
   return (
@@ -17,7 +17,7 @@ export default function Layout({ children }) {
         <Sidebar />
         <Content>{children}</Content>
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
