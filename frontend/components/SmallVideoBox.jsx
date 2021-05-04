@@ -32,7 +32,7 @@ const VideoThumbnail = ({ item }) => {
         </p>
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>
-      <a href={`VideoBoard?url=${item.channelUrl}`} alt="channel">
+      <a href={`channel?url=${item.channelUrl}`} alt="channel">
         <p className="text-xs text-gray-600 hover:text-gray-400 dark:text-gray-300">
           {item.channel}
         </p>

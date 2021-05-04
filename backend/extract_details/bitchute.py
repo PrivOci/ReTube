@@ -164,6 +164,7 @@ async def get_bitchute_channel_source(details: dict) -> dict:
         video_entry[
             "videoUrl"] = f"https://www.bitchute.com/video/{entry['link'].split('/embed/')[1]}"
         video_entry["platform"] = BITCHUTE
+        video_entry["channelUrl"] = f"https://www.bitchute.com/channel/{details['id']}"
         video_entries.append(video_entry)
 
     data_dict["ready"] = True
