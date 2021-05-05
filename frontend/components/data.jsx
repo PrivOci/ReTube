@@ -13,3 +13,9 @@ export const config = proxy(
     spell_checker: false,
   }
 );
+
+export const dbWatched = proxy(
+  JSON.parse(localStorage.getItem("watched")) ?? {
+    links: [],
+  }
+);

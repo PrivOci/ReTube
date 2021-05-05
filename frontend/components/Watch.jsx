@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { useRouter } from "next/router";
 import useSWR from "swr";
@@ -36,7 +36,8 @@ const fetchVideoMetaSWR = async (platform_id) => {
 const Watch = () => {
   const router = useRouter();
 
-  let targetUrl = router.asPath.split("url=")[1];
+  // TODO: standartize original URL (targetUrl)
+  let targetUrl = router.asPath.split("url=")[1].replace("https://www.", "");
   let [platform, id] = videoUrlDetails(targetUrl);
 
   console.log(`watch: p:${platform} id:${id}`);
@@ -60,7 +61,7 @@ const Watch = () => {
             videoProps={videoProps}
             details={data}
             platform={platform}
-            url={targetUrl}
+            originalUrl={targetUrl}
           />
         </div>
       )}
