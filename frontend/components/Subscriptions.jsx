@@ -63,7 +63,10 @@ const Subscriptions = () => {
   useEffect(() => {
     const proxy_data = require("./data");
     let subsStore = snapshot(proxy_data.subscriptions);
-    localStorage.setItem("subscriptions", JSON.stringify(proxy_data.subscriptions));
+    localStorage.setItem(
+      "subscriptions",
+      JSON.stringify(proxy_data.subscriptions)
+    );
 
     fetchSubsVideos(subsStore, setVideoDataState);
 
@@ -73,13 +76,15 @@ const Subscriptions = () => {
   }, []);
 
   return (
-    <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-      {(!videoData || !videoData.content || !videoData.content.length
-        ? Array.from(new Array(3))
-        : videoData.ready
-        ? videoData.content
-        : [null, ...videoData.content]
-      ).map((item, index) => videoBoxes(item, index))}
+    <div className="container px-5 py-5 mx-auto">
+      <div className="flex flex-wrap -m-4">
+        {(!videoData || !videoData.content || !videoData.content.length
+          ? Array.from(new Array(3))
+          : videoData.ready
+          ? videoData.content
+          : [null, ...videoData.content]
+        ).map((item, index) => videoBoxes(item, index))}
+      </div>
     </div>
   );
 };

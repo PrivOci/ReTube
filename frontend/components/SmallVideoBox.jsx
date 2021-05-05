@@ -12,7 +12,7 @@ const VideoThumbnail = ({ item }) => {
   const platform = platforms[item.platform];
 
   return (
-    <div className="each mb-10 m-2 inline-block align-middle">
+    <div className="inline-block align-middle overflow-hidden">
       <a href={`/watch?url=${item.videoUrl}`} alt="video source">
         <div className="relative">
           <img
@@ -45,7 +45,7 @@ const ChannelThumbnail = ({ item }) => {
   const platform = platforms[item.platform];
 
   return (
-    <div className="each mb-10 m-2 inline-block align-middle">
+    <div className="inline-block align-middle overflow-hidden">
       <a href={`channel?url=${item.channelUrl}`} alt="video source">
         <img
           src={item.thumbSrc}
@@ -69,7 +69,7 @@ const ChannelThumbnail = ({ item }) => {
 
 const videoBoxes = (item, index) => {
   return (
-    <div key={index} className="w-full max-w-xs text-center max-w-xl flex-col">
+    <div key={index} className="lg:w-1/4 md:w-1/2 p-4 w-full">
       {item ? (
         item.isChannel ? (
           <ChannelThumbnail item={item} />

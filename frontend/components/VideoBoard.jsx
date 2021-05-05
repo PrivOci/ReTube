@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 import videoBoxes from "./SmallVideoBox";
 
-import {fetchDataSWR } from "../utils";
+import { fetchDataSWR } from "../utils";
 
 import useSWR from "swr";
 
@@ -34,12 +34,19 @@ function VideoBoard() {
       ) : (
         <span />
       )}
-
+      <div className="container px-5 py-5 mx-auto">
+        <div className="flex flex-wrap -m-4">
+          {(error || !data || !data.content || !data.content.length
+            ? Array.from(new Array(3))
+            : data.content
+          ).map((item, index) => videoBoxes(item, index))}
+        </div>
+      </div>
       <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-        {(error || !data || !data.content || !data.content.length
+        {/* {(error || !data || !data.content || !data.content.length
           ? Array.from(new Array(3))
           : data.content
-        ).map((item, index) => videoBoxes(item, index))}
+        ).map((item, index) => videoBoxes(item, index))} */}
       </div>
     </div>
   );
