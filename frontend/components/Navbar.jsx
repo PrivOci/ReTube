@@ -5,7 +5,7 @@ const Navbar = () => {
     <div className="flex flex-col sm:flex-row sm:h-20 px-6 mb-1 rounded-2xl bg-white dark:bg-gray-700 relative z-50">
       <div className="h-20 w-full flex items-center justify-between sm:h-auto">
         <a className="no-underline block h-8" href="subscriptions">
-          <h1 className="text-black dark:text-white">ReTube (todo)</h1>
+          <h1 className="text-black dark:text-white">ReTube Logo (todo)</h1>
         </a>
       </div>
       <div className="w-full mx-auto mt-2 mb-4 sm:mx-0 sm:mb-0 sm:mt-0 sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:w-1/2 sm:h-full justify-center items-center block sm:flex">

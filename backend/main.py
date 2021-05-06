@@ -71,7 +71,10 @@ async def check_sentence(just_string: just_string):
 @app.post("/api/video/")
 async def get_video(details: request_details) -> dict:
     details.id = details.id.strip().strip("/")
-    return await optimize.optimized_request(dict(details), get_video_from_source, 1 if details.id == YOUTUBE else 72)
+    # YT video link expires
+    if (details.id == YOUTUBE):
+        return get_video_from_source(details)
+    return await optimize.optimized_request(dict(details), get_video_from_source, 72)
 
 
 async def get_video_from_source(details: dict) -> dict:
