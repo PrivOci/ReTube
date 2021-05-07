@@ -20,9 +20,11 @@ const VideoThumbnail = ({ item }) => {
   useEffect(() => {
     const proxy_data = require("./data");
     const dbWatched = snapshot(proxy_data.dbWatched);
-    const watchUrl = cleanUpUrl(item.videoUrl);
-    if (dbWatched.links.includes(watchUrl)) {
-      setIsWatched(true);
+    if (item.videoUrl) {
+      const watchUrl = cleanUpUrl(item.videoUrl);
+      if (dbWatched.links.includes(watchUrl)) {
+        setIsWatched(true);
+      }
     }
   }, []);
 

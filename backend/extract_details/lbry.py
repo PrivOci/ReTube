@@ -81,7 +81,7 @@ async def lbry_search_videos(search_query):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537 (KHTML, like Gecko) Chrome/89 Safari/537',
     }
     response = requests.get(
-        f'https://lighthouse.lbry.com/search?s={encoded_query}&free_only=true&size={max_results}&from=0&nsfw=false', headers=headers)
+        f'https://lighthouse.lbry.com/search?s={encoded_query}&mediaType=video&free_only=true&size={max_results}&from=0&nsfw=false', headers=headers)
     results_json = response.json()
     if not response.ok:
         # if no results
@@ -126,7 +126,7 @@ def _parse_lbry_details(entry) -> dict:
         else:
             video_entry["channel"] = entry["signing_channel"]["value"].get(
                 "title", entry["signing_channel"]["name"])
-        video_entry["duration"] =  entry["value"]["video"]["duration"]
+        video_entry["duration"] = entry["value"]["video"]["duration"]
         video_entry["views"] = ""
         video_entry["createdAt"] = int(entry["timestamp"]) * 1000
         video_entry["videoUrl"] = lbry_to_normal_url(entry["canonical_url"])
@@ -160,7 +160,7 @@ def lbry_video_details(video_url):
         "likeCount": "",
         "dislikeCount": "",
         "thumbnail": json_details["value"]["thumbnail"]["url"],
-        "createdAt":int(json_details["timestamp"]) * 1000,
+        "createdAt": int(json_details["timestamp"]) * 1000,
         "streamUrl": video_url,
     }
     return video_details

@@ -1,4 +1,4 @@
-import _  from "lodash";
+import _ from "lodash";
 import humanizeDuration from "humanize-duration";
 
 const BACKEND_URL = "http://localhost:8000";
@@ -61,8 +61,11 @@ export const humanizeDurationSec = (sec) => {
 export const cleanUpUrl = (url) => {
   const lowerCaseUrl = url.toLowerCase();
   if (lowerCaseUrl.includes("youtube.com")) {
-    return `yt:${_.trim(url.split("watch?v=")[1], '/')}`;
-  } else if (lowerCaseUrl.includes("lbry.tv/@") || lowerCaseUrl.includes("odysee.com/@")) {
+    return `yt:${_.trim(url.split("watch?v=")[1], "/")}`;
+  } else if (
+    lowerCaseUrl.includes("lbry.tv/@") ||
+    lowerCaseUrl.includes("odysee.com/@")
+  ) {
     return `lbry:${url.split("/@")[1]}`;
   } else if (lowerCaseUrl.includes("bitchute.com/video/")) {
     return `bt:${_.trim(url.split("/video/")[1], "/")}`;
@@ -193,9 +196,8 @@ const fetchSearchAPi = async (search_api_url, search_query) => {
 };
 
 const is_spell_checker_enabled = () => {
-  // const config = JSON.parse(localStorage.getItem("config"));
-  // return config["spell_checker"];
-  return false;
+  const config = JSON.parse(localStorage.getItem("config"));
+  return config["spell_checker"];
 };
 
 const check_sentence = async (str) => {
