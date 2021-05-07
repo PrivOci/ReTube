@@ -1,4 +1,4 @@
-import _ from "lodash";
+import _  from "lodash";
 import humanizeDuration from "humanize-duration";
 
 const BACKEND_URL = "http://localhost:8000";
@@ -51,6 +51,23 @@ export const removeFromList = (myList, item) => {
 export const humanizeDurationSec = (sec) => {
   const msec = sec * 1000;
   return shortEnglishHumanizer(msec);
+};
+
+/**
+ * Removes "https://www" and trailing "/".
+ * Used to save watched video URLs;
+ * @param {string} url video url
+ */
+export const cleanUpUrl = (url) => {
+  const lowerCaseUrl = url.toLowerCase();
+  if (lowerCaseUrl.includes("youtube.com")) {
+    return `yt:${_.trim(url.split("watch?v=")[1], '/')}`;
+  } else if (lowerCaseUrl.includes("lbry.tv/@") || lowerCaseUrl.includes("odysee.com/@")) {
+    return `lbry:${url.split("/@")[1]}`;
+  } else if (lowerCaseUrl.includes("bitchute.com/video/")) {
+    return `bt:${_.trim(url.split("/video/")[1], "/")}`;
+  }
+  return url;
 };
 
 export const videoUrlDetails = (url) => {
@@ -234,7 +251,6 @@ export const fetchSearchResults = async (search_query) => {
 
   return allSearch;
 };
-
 
 export const timeSince = (timestamp) => {
   const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);

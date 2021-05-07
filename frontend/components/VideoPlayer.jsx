@@ -1,14 +1,12 @@
 import React from "react";
 import ReactPlayer from "react-player";
-import { platforms, timeSince, fetchDataSWR } from "../utils";
+import { platforms, timeSince, fetchDataSWR, cleanUpUrl } from "../utils";
 import useSWR from "swr";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
-
 import { dbWatched } from "./data";
-import dynamic from "next/dynamic";
 import { useSnapshot } from "valtio";
+import WatchedSymbol from "./WatchedSymbol";
+import dynamic from "next/dynamic";
 const SubscribeButton = dynamic(() => import("./SubscribeButton"), {
   ssr: false,
 });
@@ -25,22 +23,12 @@ const descriptionBox = (description) => {
   }
 };
 
-const Watched = () => {
-  return (
-    <div className="whitespace-pre">
-      {" • "}
-      <FontAwesomeIcon icon={faCheckSquare} title="watched" />
-    </div>
-  );
-};
-
 const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
   const platformName = platforms[platform];
-
   const watchedProxy = useSnapshot(dbWatched);
   const playerOnProgress = ({ played }) => {
     if (played > 0.9) {
-      dbWatched.links.push(originalUrl);
+      dbWatched.links.push(cleanUpUrl(originalUrl));
       dbWatched.links = [...new Set(dbWatched.links)];
       localStorage.setItem("watched", JSON.stringify(dbWatched));
     }
@@ -83,7 +71,11 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
                 details.viewCount
               ).toLocaleString()} views • ${timeSince(details.createdAt)} ago`}
             </span>
-            {watchedProxy.links.includes(originalUrl) ? <Watched /> : <span />}
+            {watchedProxy.links.includes(cleanUpUrl(originalUrl)) ? (
+              <WatchedSymbol withDot={true} />
+            ) : (
+              <span />
+            )}
           </div>
           <div className="flex space-x-4">
             <SubscribeButton

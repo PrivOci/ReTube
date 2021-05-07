@@ -1,15 +1,30 @@
-import React from "react";
-import { platforms, humanizeDurationSec, timeSince } from "../utils";
+import React, { useEffect, useState } from "react";
+import {
+  platforms,
+  humanizeDurationSec,
+  timeSince,
+  cleanUpUrl,
+} from "../utils";
 import Skeleton from "./Skeleton";
-
-import dynamic from 'next/dynamic'
-const SubscribeButton = dynamic(
-  () => import("./SubscribeButton"),
-  { ssr: false }
-);
+import WatchedSymbol from "./WatchedSymbol";
+import { snapshot } from "valtio";
+import dynamic from "next/dynamic";
+const SubscribeButton = dynamic(() => import("./SubscribeButton"), {
+  ssr: false,
+});
 
 const VideoThumbnail = ({ item }) => {
   const platform = platforms[item.platform];
+  const [isWatched, setIsWatched] = useState(false);
+
+  useEffect(() => {
+    const proxy_data = require("./data");
+    const dbWatched = snapshot(proxy_data.dbWatched);
+    const watchUrl = cleanUpUrl(item.videoUrl);
+    if (dbWatched.links.includes(watchUrl)) {
+      setIsWatched(true);
+    }
+  }, []);
 
   return (
     <div className="inline-block align-middle overflow-hidden">
@@ -26,6 +41,13 @@ const VideoThumbnail = ({ item }) => {
           <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute right-2 bottom-2 bg-opacity-50">
             {humanizeDurationSec(item.duration)}
           </span>
+          {isWatched ? (
+            <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute left-2 top-2 bg-opacity-50">
+              <WatchedSymbol withDot={false} />
+            </span>
+          ) : (
+            <span />
+          )}
         </div>
         <p className="text-xs px-1 bg-gray-200 text-gray-800 rounded-full">
           {platform}
