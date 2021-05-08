@@ -45,7 +45,7 @@ const Watch = () => {
   const videoProps = {
     controls: true,
     url: data ? data.streamUrl : null,
-    light: data ? data.thumbnailUrl : null,
+    // light: data ? (data.thumbnailUrl ? data.thumbnailUrl : null) : null,
     // https://github.com/CookPete/react-player#props
   };
   return (

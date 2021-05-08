@@ -113,7 +113,7 @@ async def get_video_from_source(details: dict) -> dict:
                 "likeCount": f"{meta['like_count']}" if "like_count" in meta else "",
                 "dislikeCount": f"{meta['dislike_count']}" if "dislike_count" in meta else "",
                 "title": f"{meta['title']}",
-                "thumbnail": f"{meta['thumbnail']}",
+                "thumbnailUrl": f"{meta['thumbnail']}",
                 "streamUrl": f"{meta['url']}",
                 "channelUrl": f"{meta['channel_url']}",
             }

@@ -67,7 +67,7 @@ def bitchute_video_details(video_url) -> dict:
         "likeCount": count_json["like_count"],
         "dislikeCount": count_json["dislike_count"],
         "subscriberCount": count_json["subscriber_count"],
-        "thumbnail": soup.find("video", {"id": "player"})["poster"],
+        "thumbnailUrl": soup.find("video", {"id": "player"})["poster"],
         "createdAt": int(publish_date) * 1000,
         "streamUrl": soup.find("video", {"id": "player"}).source["src"],
     }

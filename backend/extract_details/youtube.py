@@ -48,7 +48,7 @@ def youtube_video_details(video_url):
         "averageRating": yt.rating,
         "likeCount": "",
         "dislikeCount": "",
-        "thumbnail": yt.thumbnail_url,
+        "thumbnailUrl": yt.thumbnail_url,
         "streamUrl": streamUrl,
         # "channelUrl": f"{meta['channel_url']}",
 

@@ -44,6 +44,7 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
         <div className="aspect-w-16 aspect-h-9 lg:aspect-none flex justify-center">
           <ReactPlayer
             {...videoProps}
+            playing
             width="100%"
             height="100%"
             onProgress={playerOnProgress}
