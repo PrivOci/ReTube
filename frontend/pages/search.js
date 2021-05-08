@@ -20,11 +20,11 @@ export default function search() {
     const checkQuery = checkSentence(searchQuery);
 
     let allWait = [];
-    // allWait.push(fetchSearchAPi(YOUTUBE_SEARCH_CHANNELS, searchQuery));
-    // allWait.push(fetchSearchAPi(LBRY_SEARCH_CHANNELS, searchQuery));
-    // allWait.push(fetchSearchAPi(YOUTUBE_SEARCH, searchQuery));
+    allWait.push(fetchSearchAPi(YOUTUBE_SEARCH_CHANNELS, searchQuery));
+    allWait.push(fetchSearchAPi(LBRY_SEARCH_CHANNELS, searchQuery));
+    allWait.push(fetchSearchAPi(YOUTUBE_SEARCH, searchQuery));
     allWait.push(fetchSearchAPi(LBRY_SEARCH, searchQuery));
-    // allWait.push(fetchSearchAPi(BITCHUTE_SEARCH, searchQuery));
+    allWait.push(fetchSearchAPi(BITCHUTE_SEARCH, searchQuery));
     let allSearch = {};
     allSearch.platform = "search";
     allSearch.ready = false;
