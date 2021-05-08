@@ -18,7 +18,7 @@ async def youtube_search_videos(search_query):
     video_entries = []
     for video in results_json.result()["result"]:
         video_entry = {}
-        video_entry["thumbSrc"] = video["thumbnails"][0]["url"].split("?sqp")[
+        video_entry["thumbnailUrl"] = video["thumbnails"][0]["url"].split("?sqp")[
             0]
         video_entry["title"] = video["title"]
         video_entry["channel"] = video["channel"]["name"]
@@ -75,7 +75,7 @@ async def youtube_channel_search(search_query):
         thumb = channel["thumbnails"][-1]["url"]
         if thumb.startswith("//"):
             thumb = f"https:{thumb}"
-        channel_entry["thumbSrc"] = thumb
+        channel_entry["thumbnailUrl"] = thumb
         channel_entry["title"] = channel["title"]
         channel_entry["channel"] = channel["title"]
         channel_entry["channelUrl"] = channel["link"]
@@ -104,7 +104,7 @@ async def get_youtube_videos_source(details: dict) -> dict:
         content_list = content["feed"]["entry"]
     for entry in content_list:
         video_entry = {}
-        video_entry["thumbSrc"] = entry["media:group"]["media:thumbnail"]["@url"]
+        video_entry["thumbnailUrl"] = entry["media:group"]["media:thumbnail"]["@url"]
         video_entry["title"] = entry["title"]
         video_entry["channel"] = entry["author"]["name"]
         video_entry["views"] = entry["media:group"]["media:community"]["media:statistics"]["@views"]

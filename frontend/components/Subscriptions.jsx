@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import videoBoxes from "./SmallVideoBox";
 import { fetchVideos } from "../utils";
 import { snapshot } from "valtio";
+import VideoBoard from "./VideoBoard";
 
 const isFromToday = (videoEntry) => {
   const oneDay = 24 * 60 * 60 * 1000;
@@ -75,18 +76,7 @@ const Subscriptions = () => {
     };
   }, []);
 
-  return (
-    <div className="container px-5 py-5 mx-auto">
-      <div className="flex flex-wrap -m-4">
-        {(!videoData || !videoData.content || !videoData.content.length
-          ? Array.from(new Array(3))
-          : videoData.ready
-          ? videoData.content
-          : [null, ...videoData.content]
-        ).map((item, index) => videoBoxes(item, index))}
-      </div>
-    </div>
-  );
+  return <VideoBoard data={videoData} />;
 };
 
 export default Subscriptions;

@@ -1,43 +1,18 @@
 import React from "react";
-import { useRouter } from "next/router";
-
 import videoBoxes from "./SmallVideoBox";
+import Suggestion from "./Suggestion";
 
-import { fetchDataSWR } from "../utils";
-
-import useSWR from "swr";
-
-function VideoBoard() {
-  const router = useRouter();
-
-  let targetUrl = router.asPath;
-  let search = targetUrl.split("search=")[1];
-
-  const { data, error } = useSWR([targetUrl, search], fetchDataSWR);
-
+function VideoBoard({ data }) {
   return (
     <div>
-      {data && "suggestion" in data ? (
-        <h3 className="text-md text-black dark:text-white antialiased sm:subpixel-antialiased">
-          {`Do you mean: `}
-          <span>
-            <a
-              href={`VideoBoard?search=${data.suggestion}`}
-              alt="search"
-              className="hover:underline text-blue-400 hover:text-blue-500"
-            >
-              {data.suggestion}
-            </a>
-          </span>
-        </h3>
-      ) : (
-        <span />
-      )}
+      <Suggestion data={data} />
       <div className="container px-5 py-5 mx-auto">
         <div className="flex flex-wrap -m-4">
-          {(error || !data || !data.content || !data.content.length
+          {(!data || !data.content || !data.content.length
             ? Array.from(new Array(3))
-            : data.content
+            : data.ready
+            ? data.content
+            : [null, ...data.content]
           ).map((item, index) => videoBoxes(item, index))}
         </div>
       </div>

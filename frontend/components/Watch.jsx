@@ -28,7 +28,6 @@ const fetchVideoMetaSWR = async (platform_id) => {
         console.log("failed to get video details");
         return {};
       }
-
       return data.content;
     });
 };

@@ -51,20 +51,22 @@ def get_video_url(lbry_url):
     response = requests.post(
         'https://api.lbry.tv/api/v1/proxy?m=get', headers=_headers, data=json.dumps(data))
     data = response.json()
+    if not "result" in data:
+        return None
     streaming_url = data["result"]["streaming_url"]
     return streaming_url
 
 
 def normal_to_lbry_url(normal_url):
     # lbry/odysee URL to lbry api accessible format
-    protocol = "lbry://@"
-    channel_and_video = normal_url.split("/@")[1].replace(":", "#")
+    protocol = "lbry://"
+    channel_and_video = normal_url.split("odysee.com/")[1].replace(":", "#")
     return f"{protocol}{channel_and_video}"
 
 
 def lbry_to_normal_url(lbry_url):
-    protocol = "https://odysee.com/@"
-    channel_and_video = lbry_url.split("/@")[1].replace("#", ":")
+    protocol = "https://odysee.com/"
+    channel_and_video = lbry_url.split("lbry://")[1].replace("#", ":")
     return f"{protocol}{channel_and_video}"
 
 
@@ -110,9 +112,9 @@ def _parse_lbry_details(entry) -> dict:
     video_entry["platform"] = LBRY
 
     if 'url' in entry["value"]["thumbnail"]:
-        video_entry["thumbSrc"] = entry["value"]["thumbnail"]["url"]
+        video_entry["thumbnailUrl"] = entry["value"]["thumbnail"]["url"]
     else:
-        video_entry["thumbSrc"] = "https://user-images.githubusercontent.com/74614193/112720980-68bab700-8ef9-11eb-9319-0e79508b6e7e.png"
+        video_entry["thumbnailUrl"] = "https://user-images.githubusercontent.com/74614193/112720980-68bab700-8ef9-11eb-9319-0e79508b6e7e.png"
     if "title" in entry["value"]:
         video_entry["title"] = entry["value"]["title"]
     else:
@@ -122,10 +124,12 @@ def _parse_lbry_details(entry) -> dict:
         video_entry["channelUrl"] = lbry_to_normal_url(entry["canonical_url"])
     elif entry["value_type"] == "stream" and 'video' in entry["value"]:
         if 'value' not in entry["signing_channel"]:
-            video_entry["channel"] = "Anonymous"
+            video_entry["author"] = "Anonymous"
         else:
-            video_entry["channel"] = entry["signing_channel"]["value"].get(
+            video_entry["author"] = entry["signing_channel"]["value"].get(
                 "title", entry["signing_channel"]["name"])
+            video_entry["channelUrl"] = lbry_to_normal_url(
+                entry["signing_channel"]["short_url"])
         video_entry["duration"] = entry["value"]["video"]["duration"]
         video_entry["views"] = ""
         video_entry["createdAt"] = int(entry["timestamp"]) * 1000
@@ -141,28 +145,17 @@ def lbry_video_details(video_url):
 
     json_details = _get_details([lbry_url])[lbry_url]
     video_url = get_video_url(lbry_url)
+    if not video_url:
+        return None
     claim_id = json_details["claim_id"]
     view_count = get_view_count(claim_id)
 
-    video_details = {
-        "id": claim_id,
-        "title": json_details["value"]["title"],
-        "description": json_details["value"].get(
-            "description", ""),
-        "author": json_details["signing_channel"]["value"].get(
-            "title", json_details["signing_channel"]["name"]),
-        "channelUrl":
-            json_details["signing_channel"]["short_url"].replace(
-                "lbry://", "https://odysee.com/").replace("#", ":"),
-        "duration": json_details["value"]["video"]["duration"],
-        "viewCount": view_count,
-        "averageRating": "",
-        "likeCount": "",
-        "dislikeCount": "",
-        "thumbnail": json_details["value"]["thumbnail"]["url"],
-        "createdAt": int(json_details["timestamp"]) * 1000,
-        "streamUrl": video_url,
-    }
+    video_details = _parse_lbry_details(json_details)
+    video_details["id"] = claim_id
+    video_details["viewCount"] = view_count
+    video_details["streamUrl"] = video_url
+    video_details["description"] = json_details["value"].get("description", "")
+
     return video_details
 
 

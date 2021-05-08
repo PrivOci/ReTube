@@ -37,6 +37,7 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
   // prefetch channel since next/link not working here
   useSWR([details.channelUrl, undefined], fetchDataSWR);
 
+  console.log(details);
   return (
     <div className="grid grid-cols-1">
       <div className="shadow-lg justify-center rounded-2xl p-4 bg-white dark:bg-gray-700 w-full">
@@ -78,10 +79,14 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
             )}
           </div>
           <div className="flex space-x-4">
-            <SubscribeButton
-              channel_url={details.channelUrl}
-              count={details.subscriberCount}
-            />
+            {details.channelUrl ? (
+              <SubscribeButton
+                channel_url={details.channelUrl}
+                count={details.subscriberCount}
+              />
+            ) : (
+              <span />
+            )}
             <button
               className="items-center shadow bg-red-500 mt-2 px-4 py-2 text-white hover:bg-red-400 rounded-lg"
               onClick={() => window.open(originalUrl, "_blank")}

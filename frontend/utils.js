@@ -7,12 +7,12 @@ const YT_API = `${BACKEND_URL}/api/youtube`;
 const LBRY_API = `${BACKEND_URL}/api/lbry`;
 const BITCHUTE_API = `${BACKEND_URL}/api/bitchute`;
 
-const YOUTUBE_SEARCH = `${BACKEND_URL}/api/youtube/search/`;
-const LBRY_SEARCH = `${BACKEND_URL}/api/lbry/search/`;
-const BITCHUTE_SEARCH = `${BACKEND_URL}/api/bitchute/search/`;
+export const YOUTUBE_SEARCH = `${BACKEND_URL}/api/youtube/search/`;
+export const LBRY_SEARCH = `${BACKEND_URL}/api/lbry/search/`;
+export const BITCHUTE_SEARCH = `${BACKEND_URL}/api/bitchute/search/`;
 
-const YOUTUBE_SEARCH_CHANNELS = `${BACKEND_URL}/api/youtube/channels`;
-const LBRY_SEARCH_CHANNELS = `${BACKEND_URL}/api/lbry/channels`;
+export const YOUTUBE_SEARCH_CHANNELS = `${BACKEND_URL}/api/youtube/channels`;
+export const LBRY_SEARCH_CHANNELS = `${BACKEND_URL}/api/lbry/channels`;
 
 const CHECK_GRAMMAR_API = `${BACKEND_URL}/api/check`;
 
@@ -62,11 +62,8 @@ export const cleanUpUrl = (url) => {
   const lowerCaseUrl = url.toLowerCase();
   if (lowerCaseUrl.includes("youtube.com")) {
     return `yt:${_.trim(url.split("watch?v=")[1], "/")}`;
-  } else if (
-    lowerCaseUrl.includes("lbry.tv/@") ||
-    lowerCaseUrl.includes("odysee.com/@")
-  ) {
-    return `lbry:${url.split("/@")[1]}`;
+  } else if (lowerCaseUrl.includes("odysee.com/")) {
+    return `lbry:${url.split("odysee.com/")[1]}`;
   } else if (lowerCaseUrl.includes("bitchute.com/video/")) {
     return `bt:${_.trim(url.split("/video/")[1], "/")}`;
   }
@@ -74,14 +71,15 @@ export const cleanUpUrl = (url) => {
 };
 
 export const videoUrlDetails = (url) => {
-  // console.log(url);
+  url = _.trim(url, "/");
+  console.log(url);
   let details = [];
   if (url.includes("youtube.com")) {
     details[0] = YOUTUBE;
     details[1] = url.split("watch?v=")[1];
-  } else if (url.includes("lbry.tv/@") || url.includes("odysee.com/@")) {
+  } else if (url.includes("odysee.com/")) {
     details[0] = LBRY;
-    details[1] = "@" + url.split("/@")[1];
+    details[1] = url.split("odysee.com/")[1];
   } else if (url.includes("bitchute.com/video/")) {
     details[0] = BITCHUTE;
     details[1] = _.trim(url.split("/video/")[1], "/");
@@ -99,6 +97,10 @@ export const fetchDataSWR = async (url, search) => {
     return fetchVideos(url);
   }
 };
+
+export const isAnonymousChannel = (channel) => {
+  
+}
 
 export const channelUrlDetails = (url) => {
   let details = [];
@@ -178,7 +180,7 @@ export const fetchPopularVideos = async () => {
   return allPopular;
 };
 
-const fetchSearchAPi = async (search_api_url, search_query) => {
+export const fetchSearchAPi = async (search_api_url, search_query) => {
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -200,7 +202,7 @@ const is_spell_checker_enabled = () => {
   return config["spell_checker"];
 };
 
-const check_sentence = async (str) => {
+export const checkSentence = async (str) => {
   if (!is_spell_checker_enabled()) {
     return { need_change: false, result: "" };
   }

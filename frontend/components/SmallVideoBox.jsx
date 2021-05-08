@@ -33,7 +33,7 @@ const VideoThumbnail = ({ item }) => {
       <a href={`/watch?url=${item.videoUrl}`} alt="video source">
         <div className="relative">
           <img
-            src={item.thumbSrc}
+            src={item.thumbnailUrl}
             alt="thumbnail"
             className="object-center rounded-xl mb-1 transition duration-300 ease-in-out hover:opacity-75"
           />
@@ -72,7 +72,7 @@ const ChannelThumbnail = ({ item }) => {
     <div className="inline-block align-middle overflow-hidden">
       <a href={`channel?url=${item.channelUrl}`} alt="video source">
         <img
-          src={item.thumbSrc}
+          src={item.thumbnailUrl}
           alt="thumbnail"
           className="object-center rounded-2xl mb-1 transition duration-300 ease-in-out hover:opacity-75"
         />

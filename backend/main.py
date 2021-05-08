@@ -58,7 +58,7 @@ class just_string(BaseModel):
     query: str
 
 
-LB_VIDEO_URL = "https://lbry.tv/"
+LB_VIDEO_URL = "https://odysee.com/"
 YT_VIDEO_URL = "https://www.youtube.com/watch?v="
 BT_VIDEO_URL = "https://www.bitchute.com/video/"
 
@@ -127,7 +127,7 @@ async def get_video_from_source(details: dict) -> dict:
         return result
     elif details["platform"] == LBRY:
         result["content"] = lbry_video_details(video_url)
-        result['ready'] = True
+        result['ready'] = False if result["content"] == None else True
         result["platform"] = LBRY
         return result
     else:

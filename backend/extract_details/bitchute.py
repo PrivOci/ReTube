@@ -76,7 +76,7 @@ def bitchute_video_details(video_url) -> dict:
 
 def _parse_bitchute_details(entry) -> dict:
     video_entry = {}
-    video_entry["thumbSrc"] = entry["images"]["thumbnail"]
+    video_entry["thumbnailUrl"] = entry["images"]["thumbnail"]
     video_entry["title"] = entry["name"]
     video_entry["channel"] = entry["channel_name"]
     video_entry["views"] = entry["views"]
@@ -155,7 +155,7 @@ async def get_bitchute_channel_source(details: dict) -> dict:
     video_entries = []
     for entry in content["rss"]["channel"]["item"]:
         video_entry = {}
-        video_entry["thumbSrc"] = entry["enclosure"]["@url"]
+        video_entry["thumbnailUrl"] = entry["enclosure"]["@url"]
         video_entry["title"] = entry["title"]
         video_entry["channel"] = details['id']
         video_entry["views"] = ""
@@ -197,7 +197,7 @@ async def get_bitchute_popular():
         if not hasattr(block, 'div'):
             continue
 
-        video_entry["thumbSrc"] = block.find("img", src=True)[
+        video_entry["thumbnailUrl"] = block.find("img", src=True)[
             "data-src"].strip()
 
         video_entry["title"] = block.find(
