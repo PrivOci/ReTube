@@ -2,6 +2,7 @@ import youtube_dl as yt
 from extract_details.bitchute import bitchute_video_details, bitchute_search_video, get_bitchute_channel_source
 from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details, lbry_channel_search
 from extract_details.youtube import youtube_search_videos, youtube_video_details, youtube_channel_search, get_youtube_videos_source
+from extract_details.facebook import get_facebook_page_source
 from spelling import ginger_check_sentence
 
 from fastapi import FastAPI
@@ -23,11 +24,9 @@ app = FastAPI()
 
 # testing
 origins = [
-    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:3033",
     "http://localhost:8080",
-    "http://127.0.0.1:8080",
-    "http://127.0.0.1",
-    "*",
 ]
 
 app.add_middleware(
@@ -42,6 +41,7 @@ app.add_middleware(
 YOUTUBE = "yt"
 LBRY = "lb"
 BITCHUTE = "bc"
+FACEBOOK = "fb"
 
 
 class request_details(BaseModel):
@@ -249,6 +249,18 @@ async def get_bitchute_channel(details: request_details):
     return await optimize.optimized_request(
         dict(details),
         get_bitchute_channel_source,
+        1)
+
+
+# Facebook page(channel) to JSON
+@app.post("/api/facebook/c/")
+async def get_facebook_channel(details: request_details):
+    details = dict(details)
+    details["id"] = details["id"].strip().strip("/")
+    details["channel"] = True
+    return await optimize.optimized_request(
+        dict(details),
+        get_facebook_page_source,
         1)
 
 
