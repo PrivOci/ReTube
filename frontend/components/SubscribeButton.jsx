@@ -8,6 +8,7 @@ import { subscriptions } from "./data";
 const YOUTUBE = "yt";
 const LBRY = "lb";
 const BITCHUTE = "bc";
+const FACEBOOK = "fb";
 
 const IsSubscribed = (subsReadOnly, channel_url) => {
   let [platform, id] = channelUrlDetails(channel_url);
@@ -19,6 +20,8 @@ const IsSubscribed = (subsReadOnly, channel_url) => {
       return subsReadOnly.bitchute.includes(id);
     case LBRY:
       return subsReadOnly.lbry.includes(id);
+    case FACEBOOK:
+        return subsReadOnly.facebook.includes(id); 
     default:
       return false;
   }
@@ -60,6 +63,13 @@ const SubscribeButton = ({ channel_url, count }) => {
               removeFromList(subscriptions.lbry, id);
             } else {
               subscriptions.lbry.push(id);
+            }
+            break;
+          case FACEBOOK:
+            if (subsReadOnly.facebook.includes(id)) {
+              removeFromList(subscriptions.facebook, id);
+            } else {
+              subscriptions.facebook.push(id);
             }
             break;
           default:

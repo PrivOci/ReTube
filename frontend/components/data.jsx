@@ -3,6 +3,7 @@ import { proxy } from "valtio";
 export const subscriptions = proxy(
   JSON.parse(localStorage.getItem("subscriptions")) ?? {
     youtube: [],
+    facebook: [],
     lbry: [],
     bitchute: [],
   }
