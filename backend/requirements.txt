@@ -9,5 +9,6 @@ redis
 youtube-search-python
 pytube
 youtube_dl
+facebook_scraper
 gingerit
 loguru
