@@ -48,6 +48,8 @@ const fetchSubsVideos = async (subsStore, setVideoDataState) => {
       continue;
     }
     let videoEntries = result.content;
+    if (!videoEntries)
+      continue
     videoEntries = videoEntries.filter(isFromToday);
     allSubs.content = allSubs.content.concat(videoEntries);
 

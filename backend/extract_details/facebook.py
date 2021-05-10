@@ -32,14 +32,14 @@ async def get_facebook_page_source(details: dict):
             "thumbnailUrl": post["video_thumbnail"],
             "createdAt": int(post["time"].timestamp()) * 1000,
             "videoUrl": post["post_url"],
+            "duration": post["video_duration_seconds"],
+            "views": post["video_watches"],
         }
 
         video_url = video_entry["videoUrl"].split("facebook.com/")[1]
         global_video_details_url[video_url] = video_entry
         global_video_details_url[video_url]["description"] = post["post_text"]
         global_video_details_url[video_url]["streamUrl"] = post["video"]
-        # global_video_details_url[video_url]["views"] =
-        # global_video_details_url[video_url]["duration"] =
 
         video_entries.append(video_entry)
     data_dict["ready"] = True

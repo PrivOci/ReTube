@@ -83,6 +83,7 @@ async def prefetch_channels(platform, channels, source_function) -> None:
         if difference.days != 0:
             del channels[id]
             continue
+        logger.debug(f"prefetch: {details['id']} - {details['platform']}")
         await optimize.optimized_request(dict(details), source_function, 1, forced=True)
 
 
