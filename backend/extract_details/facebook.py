@@ -25,7 +25,8 @@ async def get_facebook_page_source(details: dict):
         video_entry = {
             "platform": FACEBOOK,
             "id": details["id"],
-            "title": post["text"],
+            "title": post["text"] if post["text"]
+            else post["time"].strftime("%m/%d/%Y"),
             "author": post["username"],
             "channelUrl": post["user_url"].split("?")[0],
             "thumbnailUrl": post["video_thumbnail"],
