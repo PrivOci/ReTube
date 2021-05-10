@@ -70,7 +70,7 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
             </svg>
             <span>
               {`${Number(
-                details.viewCount
+                details.views
               ).toLocaleString()} views • ${timeSince(details.createdAt)} ago`}
             </span>
             {watchedProxy.links.includes(cleanUpUrl(originalUrl)) ? (

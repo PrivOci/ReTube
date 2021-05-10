@@ -152,7 +152,7 @@ def lbry_video_details(video_url):
 
     video_details = _parse_lbry_details(json_details)
     video_details["id"] = claim_id
-    video_details["viewCount"] = view_count
+    video_details["views"] = view_count
     video_details["streamUrl"] = video_url
     video_details["description"] = json_details["value"].get("description", "")
 

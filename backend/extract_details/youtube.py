@@ -21,7 +21,7 @@ async def youtube_search_videos(search_query):
         video_entry["thumbnailUrl"] = video["thumbnails"][0]["url"].split("?sqp")[
             0]
         video_entry["title"] = video["title"]
-        video_entry["channel"] = video["channel"]["name"]
+        video_entry["author"] = video["channel"]["name"]
         video_entry["channelUrl"] = video["channel"]["link"]
         video_entry["views"] = ""  # TODO: video["viewCount"]["text"]
         video_entry["createdAt"] = ""  # TODO: video["publishedTime"]
@@ -34,26 +34,26 @@ async def youtube_search_videos(search_query):
     return data_dict
 
 
-def youtube_video_details(video_url):
-    yt = YouTube(video_url)
-    streamUrl = yt.streams.filter(progressive=True, file_extension='mp4').order_by(
-        'resolution').desc().first().url
-    video_details = {
-        "id": yt.video_id,
-        "title": yt.title,
-        "description": yt.description,
-        "author": yt.author,
-        "duration": yt.length,
-        "viewCount": yt.views,
-        "averageRating": yt.rating,
-        "likeCount": "",
-        "dislikeCount": "",
-        "thumbnailUrl": yt.thumbnail_url,
-        "streamUrl": streamUrl,
-        # "channelUrl": f"{meta['channel_url']}",
+# def youtube_video_details(video_url):
+#     yt = YouTube(video_url)
+#     streamUrl = yt.streams.filter(progressive=True, file_extension='mp4').order_by(
+#         'resolution').desc().first().url
+#     video_details = {
+#         "id": yt.video_id,
+#         "title": yt.title,
+#         "description": yt.description,
+#         "author": yt.author,
+#         "duration": yt.length,
+#         "views": yt.views,
+#         "averageRating": yt.rating,
+#         "likeCount": "",
+#         "dislikeCount": "",
+#         "thumbnailUrl": yt.thumbnail_url,
+#         "streamUrl": streamUrl,
+#         # "channelUrl": f"{meta['channel_url']}",
 
-    }
-    return video_details
+#     }
+#     return video_details
 
 
 async def youtube_channel_search(search_query):
@@ -77,7 +77,7 @@ async def youtube_channel_search(search_query):
             thumb = f"https:{thumb}"
         channel_entry["thumbnailUrl"] = thumb
         channel_entry["title"] = channel["title"]
-        channel_entry["channel"] = channel["title"]
+        channel_entry["author"] = channel["title"]
         channel_entry["channelUrl"] = channel["link"]
         channel_entry["videoCount"] = channel["videoCount"]
         channel_entry["platform"] = YOUTUBE
@@ -106,7 +106,7 @@ async def get_youtube_videos_source(details: dict) -> dict:
         video_entry = {}
         video_entry["thumbnailUrl"] = entry["media:group"]["media:thumbnail"]["@url"]
         video_entry["title"] = entry["title"]
-        video_entry["channel"] = entry["author"]["name"]
+        video_entry["author"] = entry["author"]["name"]
         video_entry["views"] = entry["media:group"]["media:community"]["media:statistics"]["@views"]
         video_entry["createdAt"] = int(time.mktime(
             datetime.fromisoformat(entry["published"]).timetuple())) * 1000

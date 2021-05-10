@@ -1,8 +1,8 @@
 import youtube_dl as yt
 from extract_details.bitchute import bitchute_video_details, bitchute_search_video, get_bitchute_channel_source
 from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_videos, lbry_channel_details, lbry_channel_search
-from extract_details.youtube import youtube_search_videos, youtube_video_details, youtube_channel_search, get_youtube_videos_source
-from extract_details.facebook import get_facebook_page_source
+from extract_details.youtube import youtube_search_videos, youtube_channel_search, get_youtube_videos_source
+from extract_details.facebook import get_facebook_page_source, facebook_video_details
 from spelling import ginger_check_sentence
 
 from fastapi import FastAPI
@@ -61,7 +61,7 @@ class just_string(BaseModel):
 LB_VIDEO_URL = "https://odysee.com/"
 YT_VIDEO_URL = "https://www.youtube.com/watch?v="
 BT_VIDEO_URL = "https://www.bitchute.com/video/"
-
+FB_VIDEO_URL = "https://www.facebook.com/"
 
 @app.post("/api/check")
 async def check_sentence(just_string: just_string):
@@ -89,6 +89,8 @@ async def get_video_from_source(details: dict) -> dict:
         video_url = YT_VIDEO_URL + details["id"]
     elif details["platform"] == BITCHUTE:
         video_url = BT_VIDEO_URL + details["id"]
+    elif details["platform"] == FACEBOOK:
+        video_url = FB_VIDEO_URL + details["id"]
     else:
         return result
 
@@ -108,8 +110,8 @@ async def get_video_from_source(details: dict) -> dict:
                 "description": f"{meta['description']}",
                 "author": f"{meta['uploader']}",
                 "duration": f"{meta['duration']}",
-                "viewCount": int(meta['view_count']),
-                "averageRating": f"{meta['average_rating']}" if "average_rating" in meta else "",
+                "views": int(meta['view_count']),
+                # "averageRating": f"{meta['average_rating']}" if "average_rating" in meta else "",
                 "likeCount": f"{meta['like_count']}" if "like_count" in meta else "",
                 "dislikeCount": f"{meta['dislike_count']}" if "dislike_count" in meta else "",
                 "title": f"{meta['title']}",
@@ -129,6 +131,11 @@ async def get_video_from_source(details: dict) -> dict:
         result["content"] = lbry_video_details(video_url)
         result['ready'] = False if result["content"] == None else True
         result["platform"] = LBRY
+        return result
+    elif details["platform"] == FACEBOOK:
+        result["content"] = facebook_video_details(video_url)
+        result['ready'] = False if result["content"] == None else True
+        result["platform"] = FACEBOOK
         return result
     else:
         return result

@@ -62,7 +62,7 @@ def bitchute_video_details(video_url) -> dict:
         "channelUrl": "https://bitchute.com" +
         soup.find("p", {"class": "owner"}).a["href"],
         "duration": "",
-        "viewCount": count_json["view_count"],
+        "views": count_json["view_count"],
         "average_rating": "",
         "likeCount": count_json["like_count"],
         "dislikeCount": count_json["dislike_count"],
@@ -78,7 +78,7 @@ def _parse_bitchute_details(entry) -> dict:
     video_entry = {}
     video_entry["thumbnailUrl"] = entry["images"]["thumbnail"]
     video_entry["title"] = entry["name"]
-    video_entry["channel"] = entry["channel_name"]
+    video_entry["author"] = entry["channel_name"]
     video_entry["views"] = entry["views"]
     video_entry["createdAt"] = ""
     video_entry["videoUrl"] = f"https://bitchute.com{entry['path']}"
@@ -157,7 +157,7 @@ async def get_bitchute_channel_source(details: dict) -> dict:
         video_entry = {}
         video_entry["thumbnailUrl"] = entry["enclosure"]["@url"]
         video_entry["title"] = entry["title"]
-        video_entry["channel"] = details['id']
+        video_entry["author"] = details['id']
         video_entry["views"] = ""
         video_entry["createdAt"] = int(time.mktime(
             email.utils.parsedate(entry["pubDate"]))) * 1000
@@ -168,7 +168,7 @@ async def get_bitchute_channel_source(details: dict) -> dict:
         video_entries.append(video_entry)
 
     data_dict["ready"] = True
-    data_dict["content"] = video_entries
+    data_dict["content"] = video_entries if len(video_entries) else None
     return data_dict
 
 
@@ -202,7 +202,7 @@ async def get_bitchute_popular():
 
         video_entry["title"] = block.find(
             "p", {"class": "video-card-title"}).a.text.strip()
-        video_entry["channel"] = block.find(
+        video_entry["author"] = block.find(
             "p", {"class": "video-card-channel"}).a.text.strip()
         video_entry["duration"] = parsed_time_to_seconds(
             block.find("span", {"class": "video-duration"}).text.strip())

@@ -58,7 +58,7 @@ const VideoThumbnail = ({ item }) => {
       </a>
       <a href={`channel?url=${item.channelUrl}`} alt="channel">
         <p className="text-xs text-gray-600 hover:text-gray-400 dark:text-gray-300">
-          {item.channel}
+          {item.author}
         </p>
       </a>
     </div>
