@@ -4,19 +4,18 @@ from extract_details.lbry import lbry_popular, lbry_video_details, lbry_search_v
 from extract_details.youtube import youtube_search_videos, youtube_channel_search, get_youtube_videos_source
 from extract_details.facebook import get_facebook_page_source, facebook_video_details
 from spelling import ginger_check_sentence
+import optimize
 
 from fastapi import FastAPI
+from fastapi_utils.tasks import repeat_every
 from fastapi.middleware.cors import CORSMiddleware
-
 import uvicorn
-
 from pydantic import BaseModel
-
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
-import optimize
-
+from loguru import logger
 
 app = FastAPI()
 
@@ -62,6 +61,54 @@ LB_VIDEO_URL = "https://odysee.com/"
 YT_VIDEO_URL = "https://www.youtube.com/watch?v="
 BT_VIDEO_URL = "https://www.bitchute.com/video/"
 FB_VIDEO_URL = "https://www.facebook.com/"
+
+# global list of channel URLs to prefetch them each hour.
+# Only prefetched recently requested URLs
+global_yt_urls = {}
+global_lbry_urls = {}
+global_bc_urls = {}
+global_fb_urls = {}
+
+
+async def prefetch_channels(platform, channels, source_function) -> None:
+    """
+    Prefetch channels requested within a day, remove rest.
+    """
+    details = {}
+    details["platform"] = platform
+    now = datetime.utcnow()
+    for (id, req_date) in channels.items():
+        details["id"] = id
+        difference = now - req_date
+        if difference.days != 0:
+            del channels[id]
+            continue
+        await optimize.optimized_request(dict(details), source_function, 1, forced=True)
+
+
+@app.on_event("startup")
+@repeat_every(seconds=60 * 50)  # 50 mins
+async def prefetch_yt_channels() -> None:
+    await prefetch_channels(YOUTUBE, global_yt_urls, get_youtube_videos_source)
+
+
+@app.on_event("startup")
+@repeat_every(seconds=60 * 50)  # 50 mins
+async def prefetch_lbry_channels() -> None:
+    await prefetch_channels(LBRY, global_lbry_urls, get_lbry_channel_source)
+
+
+@app.on_event("startup")
+@repeat_every(seconds=60 * 50)  # 50 mins
+async def prefetch_bc_channels() -> None:
+    await prefetch_channels(BITCHUTE, global_bc_urls, get_bitchute_channel_source)
+
+
+@app.on_event("startup")
+@repeat_every(seconds=60 * 50)  # 50 mins
+async def prefetch_fb_channels() -> None:
+    await prefetch_channels(FACEBOOK, global_fb_urls, get_facebook_page_source)
+
 
 @app.post("/api/check")
 async def check_sentence(just_string: just_string):
@@ -147,6 +194,7 @@ async def get_youtube_channel(details: request_details) -> dict:
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     details["channel"] = True
+    global_yt_urls[details["id"]] = datetime.utcnow()
     return await optimize.optimized_request(
         dict(details),
         get_youtube_videos_source,
@@ -235,6 +283,7 @@ async def get_lbry_channel(details: request_details) -> dict:
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     details["channel"] = True
+    global_lbry_urls[details["id"]] = datetime.utcnow()
     return await optimize.optimized_request(
         dict(details),
         get_lbry_channel_source,
@@ -253,6 +302,7 @@ async def get_bitchute_channel(details: request_details):
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     details["channel"] = True
+    global_bc_urls[details["id"]] = datetime.utcnow()
     return await optimize.optimized_request(
         dict(details),
         get_bitchute_channel_source,
@@ -265,6 +315,7 @@ async def get_facebook_channel(details: request_details):
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     details["channel"] = True
+    global_fb_urls[details["id"]] = datetime.utcnow()
     return await optimize.optimized_request(
         dict(details),
         get_facebook_page_source,

@@ -1,5 +1,6 @@
 beautifulsoup4
 fastapi
+fastapi_utils
 requests
 uvicorn
 xmltodict
@@ -9,3 +10,4 @@ youtube-search-python
 pytube
 youtube_dl
 gingerit
+loguru

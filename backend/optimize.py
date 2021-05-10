@@ -51,14 +51,14 @@ async def get_from_cache(key: str) -> str:
     return val
 
 
-async def optimized_request(details, get_from_source, hours=24):
+async def optimized_request(details, get_from_source, hours=24, forced=False):
 
     key_for_redis = json.dumps(details)
     # First it looks for the data in redis cache
     data = await get_from_cache(key_for_redis) if not DISABLE_CACHE else None
 
     # If cache is found then serves the data from cache
-    if data is not None:
+    if data is not None and forced is False:
         data = json.loads(data)
         data["cache"] = True
         return data
