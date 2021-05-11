@@ -70,7 +70,7 @@ def lbry_to_normal_url(lbry_url):
     return f"{protocol}{channel_and_video}"
 
 
-async def lbry_search_videos(search_query):
+def lbry_search_videos(search_query):
     search_terms = search_query["query"]
     max_results = search_query["max"]
     encoded_query = urllib.parse.quote(search_terms)
@@ -223,7 +223,7 @@ def lbry_channel_details(channel_id):
     return data_dict
 
 
-async def lbry_popular():
+def lbry_popular():
     week_ago_date = int(
         (datetime.datetime.now() - datetime.timedelta(days=7)).timestamp())
 
@@ -271,7 +271,7 @@ async def lbry_popular():
     return data_dict
 
 
-async def lbry_channel_search(search_query):
+def lbry_channel_search(search_query):
     '''Searches for channels in Lbry.
 
     Args:

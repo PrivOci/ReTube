@@ -65,7 +65,7 @@ async def optimized_request(details, get_from_source, hours=24, forced=False):
 
     else:
         # If cache is not found then sends request to the MapBox API
-        data = await get_from_source(details)
+        data = get_from_source(details)
         if not data:
             return {
                 "ready": "False"

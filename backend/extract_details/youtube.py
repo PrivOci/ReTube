@@ -1,14 +1,13 @@
 from youtubesearchpython import VideosSearch, ChannelsSearch
 from pytube import YouTube
-import urllib.parse
-from utils import get_xml_stream_as_json
+from utils.util import get_xml_stream_as_json
 import time
 from datetime import datetime
 
 YOUTUBE = "yt"
 YOUTUBE_XML = "https://www.youtube.com/feeds/videos.xml"
 
-async def youtube_search_videos(search_query):
+def youtube_search_videos(search_query):
     search_words = search_query["query"]
     max_results = search_query["max"]
 
@@ -56,7 +55,7 @@ async def youtube_search_videos(search_query):
 #     return video_details
 
 
-async def youtube_channel_search(search_query):
+def youtube_channel_search(search_query):
     '''Searches for channels in YouTube.
 
     Args:
@@ -89,13 +88,13 @@ async def youtube_channel_search(search_query):
 
 
 # Get channel/playlist videos
-async def get_youtube_videos_source(details: dict) -> dict:
+def get_youtube_videos_source(details: dict) -> dict:
     data_dict = {}
     data_dict["platform"] = YOUTUBE
     yt_type = "?playlist_id=" if details.get(
         "playlist") == True else "?channel_id="
     popular_rss_url = f"{YOUTUBE_XML}{yt_type}{details['id']}"
-    content = await get_xml_stream_as_json(popular_rss_url)
+    content = get_xml_stream_as_json(popular_rss_url)
     video_entries = []
     content_list = []
     if not isinstance(content["feed"]["entry"], list):

@@ -5,7 +5,7 @@ global_video_details_url = {}
 FACEBOOK = "fb"
 
 
-async def get_facebook_page_source(details: dict):
+def get_facebook_page_source(details: dict):
     """Gather videos from a FB page.
     Not stable, after several requests fails without cookies/auth.
     TODO: maybe optional FB account
