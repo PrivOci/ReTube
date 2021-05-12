@@ -20,7 +20,7 @@ def get_facebook_page_source(details: dict):
     data_dict["platform"] = FACEBOOK
     video_entries = []
     for post in posts_iterator:
-        if post["video"] == None or post["is_live"]:
+        if not post["video"] or post["is_live"]:
             continue
         video_entry = {
             "platform": FACEBOOK,

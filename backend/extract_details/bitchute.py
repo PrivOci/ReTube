@@ -62,7 +62,7 @@ class BitchuteProcessor:
         video_details = {
             "id": video_url.split("/video/")[1].strip().strip('/'),
             "title": soup.find("h1", {"id": "video-title"}).text,
-            "description": soup.find("meta", {"name": "description"})["content"],
+            "description": soup.find(id="video-description").text,
             "author": soup.find("p", {"class": "owner"}).a.text,
             "channelUrl": "https://bitchute.com" +
             soup.find("p", {"class": "name"}).a["href"],
