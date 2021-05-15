@@ -122,7 +122,7 @@ async def get_video(details: request_details) -> dict:
     details.id = details.id.strip().strip("/")
     # YT video link expires
     if (details.platform == YOUTUBE):
-        return get_video_from_source(details)
+        return get_video_from_source(dict(details))
     return await optimize.optimized_request(dict(details), get_video_from_source, 72)
 
 
