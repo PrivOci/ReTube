@@ -56,10 +56,8 @@ def test_get_video_bc():
     assert json_object["ready"] == True
     assert json_object["platform"] == 'bc'
     assert json_object["content"]["id"] == 'UGlrF9o9b-Q'
-    assert json_object["content"][
-        "description"] == 'This is a sample video we are using for testing as we don\'t have any of our own (yet)Making sure editing video descriptions'
     assert json_object["content"]["author"] == 'BitChute'
-    assert json_object["content"]["channelUrl"] == 'https://bitchute.com/profile/I5NgtHZn9vPj/'
+    assert json_object["content"]["channelUrl"] == 'https://bitchute.com/channel/bitchute/'
     assert json_object["content"]["title"] == 'This is the first video on #BitChute !'
     assert "bitchute.com/" in json_object["content"]["thumbnailUrl"]
     assert "/UGlrF9o9b-Q.mp4" in json_object["content"]["streamUrl"]

@@ -309,7 +309,3 @@ class LbryProcessor:
         data_dict["content"] = video_entries
         data_dict["ready"] = True
         return data_dict
-
-
-lb = LbryProcessor()
-lb.get_video_details("https://odysee.com/@trevon:7/2021-05-11-11-58-27_1:9")
