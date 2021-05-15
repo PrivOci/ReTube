@@ -121,7 +121,7 @@ async def check_sentence(just_string: just_string):
 async def get_video(details: request_details) -> dict:
     details.id = details.id.strip().strip("/")
     # YT video link expires
-    if (details.id == YOUTUBE):
+    if (details.platform == YOUTUBE):
         return get_video_from_source(details)
     return await optimize.optimized_request(dict(details), get_video_from_source, 72)
 
