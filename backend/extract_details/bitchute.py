@@ -1,4 +1,5 @@
 import requests
+import cloudscraper
 from bs4 import BeautifulSoup
 import urllib.parse
 import dateparser
@@ -31,7 +32,8 @@ class BitchuteProcessor:
     }
 
     def __init__(self) -> None:
-        self.session = requests.Session()
+        # self.session = requests.Session()
+        self.session = cloudscraper.create_scraper()  # returns a CloudScraper instance
         self.cookies = {}
         # get csrftoken
         res = self.session.get(
@@ -44,6 +46,8 @@ class BitchuteProcessor:
 
     def get_video_details(self, video_url) -> dict:
         req = self.session.get(video_url)
+        if not req.ok:
+            return None
         soup = BeautifulSoup(req.text, 'html.parser')
 
         data = {

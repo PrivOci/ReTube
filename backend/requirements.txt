@@ -12,3 +12,4 @@ youtube_dl
 facebook_scraper
 gingerit
 loguru
+cloudscraper
