@@ -15,16 +15,30 @@ export default function popular() {
     allPopular.ready = false;
     allPopular.content = [];
 
-    allPopular.content = (await ytPromise).content.slice(1, 10);
-    setVideoDataState(allPopular);
-    allPopular.content = allPopular.content.concat(
-      (await lbPromise).content.slice(1, 10)
-    );
-    setVideoDataState();
-    setVideoDataState(allPopular);
-    allPopular.content = allPopular.content.concat(
-      (await bcPromise).content.slice(1, 10)
-    );
+    const ytResults = await ytPromise;
+    if (ytResults) {
+      allPopular.content = ytResults.content.slice(1, 10);
+      setVideoDataState(allPopular);
+    }
+
+    const lbryResults = await lbPromise;
+    if (lbryResults) {
+      allPopular.content = allPopular.content.concat(
+        lbryResults.content.slice(1, 10)
+      );
+      setVideoDataState();
+      setVideoDataState(allPopular);
+    }
+
+    const bcResults = await bcPromise;
+    if (bcResults) {
+      allPopular.content = allPopular.content.concat(
+        bcResults.content.slice(1, 10)
+      );
+      setVideoDataState();
+      setVideoDataState(allPopular);
+    }
+
     allPopular.ready = true;
     setVideoDataState();
     setVideoDataState(allPopular);

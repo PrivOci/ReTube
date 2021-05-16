@@ -160,8 +160,8 @@ export const fetchVideos = async (url) => {
   );
 
   if (data.ready === false) {
-    console.log("failed to get videos");
-    return;
+    console.log(`failed to get videos: ${url}`);
+    return null;
   }
 
   return data;

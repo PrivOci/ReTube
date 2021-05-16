@@ -32,9 +32,14 @@ class BitchuteProcessor:
 
     def __init__(self) -> None:
         self.session = requests.Session()
+        self.cookies = {}
         # get csrftoken
-        self.session.get(f'{self.BITCHUTE_BASE}/help-us-grow/')
-        self.cookies = self.session.cookies.get_dict()
+        res = self.session.get(
+            f'{self.BITCHUTE_BASE}/help-us-grow/', headers=self._headers)
+        if res.ok:
+            self.cookies = self.session.cookies.get_dict()
+        if not self.cookies or not 'csrftoken' in self.cookies:
+            self.cookies["csrftoken"] = "lTJ0imXW23ycznfCjFy8rwqJxbtYZMJPgCbm2WHYF3l1454XjvkXTjvUvTsdtPCt"
         self._headers["cookie"] = f'csrftoken={self.cookies["csrftoken"]}'
 
     def get_video_details(self, video_url) -> dict:
@@ -170,7 +175,7 @@ class BitchuteProcessor:
         data_dict = {}
         data_dict["ready"] = False
         data_dict["platform"] = self.BITCHUTE
-        res = self.session.get(self.BITCHUTE_BASE)
+        res = self.session.get(self.BITCHUTE_BASE, headers=self._headers)
         if not res.ok:
             return data_dict
         soup = BeautifulSoup(res.text, 'html.parser')
