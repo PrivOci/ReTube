@@ -144,7 +144,7 @@ class BitchuteProcessor:
         data_dict["ready"] = False
         data_dict["platform"] = self.BITCHUTE
         popular_rss_url = f"{self.BITCHUTE_XML}{details['id']}"
-        content = get_xml_stream_as_json(popular_rss_url)
+        content = get_xml_stream_as_json(popular_rss_url, session=self.session)
         if not content:
             return data_dict
         video_entries = []
