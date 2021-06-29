@@ -43,13 +43,18 @@ const fetchSubsVideos = async (subsStore, setVideoDataState) => {
   });
 
   for (const waitSub of allSubsWait) {
+    if (waitSub === null) {
+      continue;
+    }
     const result = await waitSub;
+    if (result === null) {
+      continue;
+    }
     if (result.ready === "False") {
       continue;
     }
     let videoEntries = result.content;
-    if (!videoEntries)
-      continue
+    if (!videoEntries) continue;
     videoEntries = videoEntries.filter(isFromToday);
     allSubs.content = allSubs.content.concat(videoEntries);
 

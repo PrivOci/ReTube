@@ -40,4 +40,4 @@ API docs: `http://localhost:8000/docs`
 # Frontend
 `cd frontend` \
 `yarn` \
-`yarn dev run`
+`yarn run dev`
