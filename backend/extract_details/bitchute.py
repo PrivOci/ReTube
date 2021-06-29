@@ -5,6 +5,7 @@ import urllib.parse
 import dateparser
 from datetime import datetime
 import re
+from loguru import logger
 
 
 from utils.util import get_xml_stream_as_json
@@ -182,6 +183,7 @@ class BitchuteProcessor:
         data_dict["platform"] = self.BITCHUTE
         res = self.session.get(self.BITCHUTE_BASE, headers=self._headers)
         if not res.ok:
+            logger.debug(f"Failed to download bitchute popular\nReason: {res.reason}")
             return data_dict
         soup = BeautifulSoup(res.text, 'html.parser')
         content_section = soup.find("div", {"id": "listing-popular"}).div
