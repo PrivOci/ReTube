@@ -40,7 +40,11 @@ const Watch = () => {
   let [platform, id] = videoUrlDetails(targetUrl);
 
   console.log(`watch: p:${platform} id:${id}`);
-  const { data } = useSWR(JSON.stringify({ platform, id }), fetchVideoMetaSWR);
+  const { data } = useSWR(JSON.stringify({ platform, id }), fetchVideoMetaSWR, {
+    revalidateOnFocus: false,
+    refreshWhenHidden: false,
+    refreshInterval: 0,
+  });
 
   const videoProps = {
     controls: true,
