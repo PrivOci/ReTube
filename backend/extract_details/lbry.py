@@ -2,7 +2,7 @@ import requests
 import json
 import urllib.parse
 import datetime
-
+from urllib.parse import unquote
 
 class LbryProcessor:
     """Class to process Lbry/Odysee videos and channels."""
@@ -142,6 +142,7 @@ class LbryProcessor:
         return video_entry
 
     def get_video_details(self, video_url):
+        video_url = unquote(video_url)
         lbry_url = self._normal_to_lbry_url(video_url)
 
         video_url = self._get_video_url(lbry_url)
@@ -167,7 +168,7 @@ class LbryProcessor:
         # cookies = session.cookies.get_dict()
         # TODO: remove the hardcoded value
         # cookies["auth_token"]
-        auth_token = "7TCpVMwB4AYWsoihB2Emaj7G5pEZZ8zE"
+        auth_token = "5v4AcLe2fxSQ9Vxf1TV8bi4jKoxjj8Ut"
 
         response = self.session.get(
             f'https://api.lbry.com/file/view_count?auth_token={auth_token}&claim_id={claim_id}', headers=self._headers)
