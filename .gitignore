@@ -1,4 +1,4 @@
 redis-data/
 .vscode
 backend/testing.py
-# backend/extract_details/credentials
+backend/extract_details/credentials
