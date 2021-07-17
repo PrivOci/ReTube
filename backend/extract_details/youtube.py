@@ -1,6 +1,7 @@
 from typing import Dict
 from youtubesearchpython import VideosSearch, ChannelsSearch
 import youtube_dl as yt
+from youtube_dl.utils import DownloadError
 from utils.util import get_xml_stream_as_json
 import time
 from datetime import datetime
@@ -18,10 +19,15 @@ class YoutubeProcessor:
         self.ydl = yt.YoutubeDL(self.ydl_opts)
 
     def get_video_details(self, video_url) -> dict:
-        meta = self.ydl.extract_info(
-            video_url, download=False)
+        try:
+            meta = self.ydl.extract_info(
+                video_url, download=False)
+        except DownloadError as err:
+            print(err)
+            return None
         if meta["is_live"]:
             return None
+
 
         video_details = {
             "id": f"{meta['id']}",

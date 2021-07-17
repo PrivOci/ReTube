@@ -145,24 +145,24 @@ def get_video_from_source(details: dict) -> dict:
 
     # our extractors
     if details["platform"] == YOUTUBE:
-        result["content"] = yt_processor.get_video_details(video_url)
-        result['ready'] = True
         result["platform"] = YOUTUBE
+        result["content"] = yt_processor.get_video_details(video_url)
+        result['ready'] = result["content"] != None
         return result
     elif details["platform"] == BITCHUTE:
-        result["content"] = bc_processor.get_video_details(video_url)
-        result['ready'] = True
         result["platform"] = BITCHUTE
+        result["content"] = bc_processor.get_video_details(video_url)
+        result['ready'] = result["content"] != None
         return result
     elif details["platform"] == LBRY:
-        result["content"] = lbry_processor.get_video_details(video_url)
-        result['ready'] = False if result["content"] == None else True
         result["platform"] = LBRY
+        result["content"] = lbry_processor.get_video_details(video_url)
+        result['ready'] = result["content"] != None
         return result
     elif details["platform"] == FACEBOOK:
-        result["content"] = fb_processor.get_video_details(video_url)
-        result['ready'] = False if result["content"] == None else True
         result["platform"] = FACEBOOK
+        result["content"] = fb_processor.get_video_details(video_url)
+        result['ready'] = result["content"] != None
         return result
     else:
         return result
