@@ -1,4 +1,6 @@
-from facebook_scraper import get_posts
+import facebook_scraper
+import os.path
+from loguru import logger
 
 
 class FacebookProcessor:
@@ -7,6 +9,21 @@ class FacebookProcessor:
 
     def __init__(self) -> None:
         self.global_video_details_url = {}
+        curr_path = os.path.dirname(os.path.realpath(__file__))
+        credentials_file = f"{curr_path}/credentials"
+        self.username = None
+        self.password = None
+        # Make sure there is no ":" symbol in a password
+        if os.path.isfile(credentials_file):
+            with open(credentials_file, 'r') as f:
+                for curr_line in f:
+                    if curr_line.startswith("fb:"):
+                        self.username, self.password = curr_line.removeprefix(
+                            "fb:").split(":")
+                        break
+        else:
+            logger.debug(
+                f"Failed to locate credentials file: {credentials_file}\n")
 
     def channel_data(self, details: dict):
         """Gather videos from a FB page.
@@ -17,10 +34,19 @@ class FacebookProcessor:
         data_dict = {}
         data_dict["ready"] = False
         data_dict["platform"] = self.FACEBOOK
-        try:
-            posts_iterator = get_posts(page_name, page_limit=3)
-        except:
-            return data_dict
+
+        if self.username and self.password:
+            try:
+                posts_iterator = facebook_scraper.get_posts(
+                    page_name, page_limit=3, credentials=(r"{}".format(self.username), r"{}".format(self.password)))
+            except facebook_scraper.exceptions.LoginError as err:
+                logger.debug(
+                    f"failed to login Facebook\nerr: {err}\nUsername: {self.username}\n")
+                posts_iterator = facebook_scraper.get_posts(
+                    page_name, page_limit=3)
+        else:
+            posts_iterator = facebook_scraper.get_posts(
+                page_name, page_limit=3)
 
         video_entries = []
         try:
