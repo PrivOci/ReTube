@@ -19,6 +19,12 @@ class FacebookProcessor:
                 for curr_line in f:
                     if curr_line.startswith("fb:"):
                         self.username, self.password = curr_line[3:].split(":")
+                        try:
+                            facebook_scraper._scraper.login(
+                                email=self.username, password=self.password)
+                        except facebook_scraper.exceptions.LoginError as err:
+                            logger.debug(
+                                f"failed to login Facebook\nerr: {err}\nUsername: {self.username}\n")
                         break
         else:
             logger.debug(
@@ -34,18 +40,8 @@ class FacebookProcessor:
         data_dict["ready"] = False
         data_dict["platform"] = self.FACEBOOK
 
-        if self.username and self.password:
-            try:
-                posts_iterator = facebook_scraper.get_posts(
-                    page_name, page_limit=3, credentials=(r"{}".format(self.username), r"{}".format(self.password)))
-            except facebook_scraper.exceptions.LoginError as err:
-                logger.debug(
-                    f"failed to login Facebook\nerr: {err}\nUsername: {self.username}\n")
-                posts_iterator = facebook_scraper.get_posts(
-                    page_name, page_limit=3)
-        else:
-            posts_iterator = facebook_scraper.get_posts(
-                page_name, page_limit=3)
+        posts_iterator = facebook_scraper.get_posts(
+            page_name, page_limit=3)
 
         video_entries = []
         try:
