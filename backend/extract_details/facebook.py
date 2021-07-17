@@ -1,5 +1,5 @@
 import facebook_scraper
-import os.path
+import os
 from loguru import logger
 
 
@@ -10,7 +10,7 @@ class FacebookProcessor:
     def __init__(self) -> None:
         self.global_video_details_url = {}
         curr_path = os.path.dirname(os.path.realpath(__file__))
-        credentials_file = f"{curr_path}/credentials"
+        credentials_file = f"{curr_path}{os.sep}..{os.sep}credentials"
         self.username = None
         self.password = None
         # Make sure there is no ":" symbol in a password
@@ -18,8 +18,7 @@ class FacebookProcessor:
             with open(credentials_file, 'r') as f:
                 for curr_line in f:
                     if curr_line.startswith("fb:"):
-                        self.username, self.password = curr_line.removeprefix(
-                            "fb:").split(":")
+                        self.username, self.password = curr_line[3:].split(":")
                         break
         else:
             logger.debug(

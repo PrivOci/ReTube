@@ -1,5 +1,5 @@
 # https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker
-FROM tiangolo/uvicorn-gunicorn:python3.8
+FROM tiangolo/uvicorn-gunicorn:latest
 
 COPY ./ /app
 WORKDIR /app/

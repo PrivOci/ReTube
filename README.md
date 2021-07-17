@@ -44,5 +44,5 @@ API docs: `http://localhost:8000/docs`
 
 # NOTE
 
-`Facebook` sets limits to extract details if an user is not logged in, if you want to subscribe to `Facebook` pages it's recommended to provide `FB` credentials into this file `backend/extract_details/credentials` (you may need to create this file) with following format `fb:username:password`, for example, `fb:priv@oci.example.com:mypassword_123`.
+`Facebook` sets limits to extract details if an user is not logged in, if you want to subscribe to `Facebook` pages it's recommended to provide `FB` credentials into this file `backend/credentials` (you may need to create this file) with following format `fb:username:password`, for example, `fb:priv@oci.example.com:mypassword_123`.
 The `credentials` file is not shared and stays on your device, also it's recommended to create a new `FB` account for this purpose, since they may block it based on usage patterns.
