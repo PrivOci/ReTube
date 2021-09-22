@@ -53,12 +53,10 @@ const Settings = () => {
     const ytJson = jsonContent["youtube"];
     const bcJson = jsonContent["bitchute"];
     const lbJson = jsonContent["lbry"];
-    const fbJson = jsonContent["facebook"];
 
     subscriptions.youtube = _.merge(subscriptions.youtube, ytJson);
     subscriptions.bitchute = _.merge(subscriptions.bitchute, bcJson);
     subscriptions.lbry = _.merge(subscriptions.lbry, lbJson);
-    subscriptions.facebook = _.merge(subscriptions.facebook, fbJson);
 
     localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
     addToast("ReTube subscriptions updated", {

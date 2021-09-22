@@ -8,7 +8,6 @@ dateparser
 redis
 youtube-search-python
 youtube_dl
-facebook_scraper
 gingerit
 loguru
 cloudscraper

@@ -1,7 +1,6 @@
 from extract_details.youtube import YoutubeProcessor
 from extract_details.bitchute import BitchuteProcessor
 from extract_details.lbry import LbryProcessor
-from extract_details.facebook import FacebookProcessor
 from utils.spelling import ginger_check_sentence
 import utils.optimize as optimize
 
@@ -17,7 +16,6 @@ from loguru import logger
 app = FastAPI()
 bc_processor = BitchuteProcessor()
 yt_processor = YoutubeProcessor()
-fb_processor = FacebookProcessor()
 lbry_processor = LbryProcessor()
 
 # optimize.DISABLE_CACHE = True
@@ -41,7 +39,6 @@ app.add_middleware(
 YOUTUBE = "yt"
 LBRY = "lb"
 BITCHUTE = "bc"
-FACEBOOK = "fb"
 
 
 class request_details(BaseModel):
@@ -61,14 +58,12 @@ class just_string(BaseModel):
 LB_VIDEO_URL = "https://odysee.com/"
 YT_VIDEO_URL = "https://www.youtube.com/watch?v="
 BT_VIDEO_URL = "https://www.bitchute.com/video/"
-FB_VIDEO_URL = "https://www.facebook.com/"
 
 # global list of channel URLs to prefetch them each hour.
 # Only prefetched recently requested URLs
 global_yt_urls = {}
 global_lbry_urls = {}
 global_bc_urls = {}
-global_fb_urls = {}
 
 
 async def prefetch_channels(platform, channels, source_function) -> None:
@@ -106,12 +101,6 @@ async def prefetch_bc_channels() -> None:
     await prefetch_channels(BITCHUTE, global_bc_urls, bc_processor.channel_data)
 
 
-@app.on_event("startup")
-@repeat_every(seconds=60 * 50)  # 50 mins
-async def prefetch_fb_channels() -> None:
-    await prefetch_channels(FACEBOOK, global_fb_urls, fb_processor.channel_data)
-
-
 @app.post("/api/check")
 async def check_sentence(just_string: just_string):
     return ginger_check_sentence(just_string.query)
@@ -138,8 +127,6 @@ def get_video_from_source(details: dict) -> dict:
         video_url = YT_VIDEO_URL + details["id"]
     elif details["platform"] == BITCHUTE:
         video_url = BT_VIDEO_URL + details["id"]
-    elif details["platform"] == FACEBOOK:
-        video_url = FB_VIDEO_URL + details["id"]
     else:
         return result
 
@@ -157,11 +144,6 @@ def get_video_from_source(details: dict) -> dict:
     elif details["platform"] == LBRY:
         result["platform"] = LBRY
         result["content"] = lbry_processor.get_video_details(video_url)
-        result['ready'] = result["content"] != None
-        return result
-    elif details["platform"] == FACEBOOK:
-        result["platform"] = FACEBOOK
-        result["content"] = fb_processor.get_video_details(video_url)
         result['ready'] = result["content"] != None
         return result
     else:
@@ -286,19 +268,6 @@ async def get_bitchute_channel(details: request_details):
     return await optimize.optimized_request(
         dict(details),
         bc_processor.channel_data,
-        1)
-
-
-# Facebook page(channel) to JSON
-@app.post("/api/facebook/c/")
-async def get_facebook_channel(details: request_details):
-    details = dict(details)
-    details["id"] = details["id"].strip().strip("/")
-    details["channel"] = True
-    global_fb_urls[details["id"]] = datetime.utcnow()
-    return await optimize.optimized_request(
-        dict(details),
-        fb_processor.channel_data,
         1)
 
 

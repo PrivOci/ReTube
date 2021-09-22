@@ -36,11 +36,6 @@ const fetchSubsVideos = async (subsStore, setVideoDataState) => {
     const bcUrl = `https://www.bitchute.com/channel/${item}`;
     allSubsWait.push(fetchVideos(bcUrl));
   });
-  // facebook
-  subsStore.facebook.forEach((item, index) => {
-    const fbUrl = `https://www.facebook.com/${item}`;
-    allSubsWait.push(fetchVideos(fbUrl));
-  });
 
   for (const waitSub of allSubsWait) {
     if (waitSub === null) {

@@ -6,7 +6,6 @@ const BACKEND_URL = "http://localhost:8000";
 const YT_API = `${BACKEND_URL}/api/youtube`;
 const LBRY_API = `${BACKEND_URL}/api/lbry`;
 const BITCHUTE_API = `${BACKEND_URL}/api/bitchute`;
-const FACEBOOK_API = `${BACKEND_URL}/api/facebook`;
 
 export const YOUTUBE_SEARCH = `${BACKEND_URL}/api/youtube/search/`;
 export const LBRY_SEARCH = `${BACKEND_URL}/api/lbry/search/`;
@@ -21,7 +20,6 @@ const CHECK_GRAMMAR_API = `${BACKEND_URL}/api/check`;
 const YOUTUBE = "yt";
 const LBRY = "lb";
 const BITCHUTE = "bc";
-const FACEBOOK = "fb";
 
 const shortEnglishHumanizer = humanizeDuration.humanizer({
   language: "shortEn",
@@ -42,7 +40,6 @@ export const platforms = {
   yt: "YouTube",
   lb: "Lbry",
   bc: "BitChute",
-  fb: "Facebook",
 };
 
 export const removeFromList = (myList, item) => {
@@ -86,9 +83,6 @@ export const videoUrlDetails = (url) => {
   } else if (url.includes("bitchute.com/video/")) {
     details[0] = BITCHUTE;
     details[1] = _.trim(url.split("/video/")[1], "/");
-  } else if (url.includes("facebook.com/")) {
-    details[0] = FACEBOOK;
-    details[1] = _.trim(url.split("facebook.com/")[1], "/");
   }
   details[2] = `${BACKEND_URL}/api/video/`;
   return details;
@@ -136,10 +130,6 @@ export const channelUrlDetails = (url) => {
     details[0] = BITCHUTE;
     details[1] = _.trim(url.split("/channel/")[1], "/");
     details[2] = `${BITCHUTE_API}/c`;
-  } else if (url.includes("facebook.com/")) {
-    details[0] = FACEBOOK;
-    details[1] = _.trim(url.split("facebook.com/")[1], "/");
-    details[2] = `${FACEBOOK_API}/c`;
   }
   return details;
 };
