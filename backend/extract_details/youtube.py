@@ -110,6 +110,9 @@ class YoutubeProcessor:
             "playlist") == True else "?channel_id="
         popular_rss_url = f"{self.YOUTUBE_XML}{yt_type}{details['id']}"
         content = get_xml_stream_as_json(popular_rss_url)
+        if not content:
+            data_dict["ready"] = False
+            return data_dict
         video_entries = []
         content_list = []
         if not isinstance(content["feed"]["entry"], list):
