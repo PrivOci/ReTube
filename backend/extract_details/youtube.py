@@ -2,9 +2,11 @@ from typing import Dict
 from youtubesearchpython import VideosSearch, ChannelsSearch
 import youtube_dl as yt
 from youtube_dl.utils import DownloadError
-from utils.util import get_xml_stream_as_json
+from utils.util import get_xml_stream_as_json, parsed_time_to_seconds
 import time
 from datetime import datetime
+import requests
+import dateparser
 
 
 class YoutubeProcessor:
@@ -17,6 +19,7 @@ class YoutubeProcessor:
 
     def __init__(self) -> None:
         self.ydl = yt.YoutubeDL(self.ydl_opts)
+        self.session = requests.Session()
 
     def get_video_details(self, video_url) -> dict:
         try:
@@ -27,7 +30,6 @@ class YoutubeProcessor:
             return None
         if meta["is_live"]:
             return None
-
 
         video_details = {
             "id": f"{meta['id']}",
@@ -103,33 +105,105 @@ class YoutubeProcessor:
         data_dict["ready"] = True
         return data_dict
 
-    def channel_data(self, details: dict) -> dict:
+    def channel_data(self, details) -> dict:
+        """
+        Extracts video list from a channel id and playlist id
+        """
+        # access mobile version: https://m.youtube.com/?persist_app=1&app=m
+        is_it_playlist = details.get("playlist") == True
+        if is_it_playlist:
+            channel_url = f"https://m.youtube.com/playlist?list={details['id']}"
+            taget_url = f"{channel_url}&pbj=1"
+        else:
+            channel_url = f"https://m.youtube.com/channel/{details['id']}".strip(
+                "/")
+            taget_url = f'{channel_url}/videos?pbj=1'
         data_dict = {}
         data_dict["platform"] = self.YOUTUBE
-        yt_type = "?playlist_id=" if details.get(
-            "playlist") == True else "?channel_id="
-        popular_rss_url = f"{self.YOUTUBE_XML}{yt_type}{details['id']}"
-        content = get_xml_stream_as_json(popular_rss_url)
-        if not content:
+        headers = {
+            'authority': 'm.youtube.com',
+            'x-youtube-sts': '18892',
+            'x-youtube-device': 'cbr=Edge+Chromium&cbrand=google&cbrver=93.0.961.52&ceng=WebKit&cengver=537.36&cmodel=pixel+2+xl&cos=Android&cosver=8.0.0&cplatform=MOBILE&cyear=2017',
+            'x-youtube-page-label': 'youtube.mobile.web.client_20210923_00_RC00',
+            'sec-ch-ua-arch': '',
+            'sec-ch-ua-platform-version': '"8.0.0"',
+            'x-youtube-page-cl': '398415020',
+            'x-spf-referer': channel_url,
+            'x-youtube-utc-offset': '60',
+            'sec-ch-ua-model': '"Pixel 2 XL"',
+            'x-youtube-time-zone': 'Europe/London',
+            'sec-ch-ua-platform': '"Android"',
+            'sec-ch-ua-mobile': '?1',
+            'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
+            'sec-ch-ua-full-version': '"93.0.961.52"',
+            'x-youtube-client-name': '2',
+            'x-youtube-client-version': '2.20210923.00.00',
+            'sec-ch-ua': '"Microsoft Edge";v="93", " Not;A Brand";v="99", "Chromium";v="93"',
+            'accept': '*/*',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-dest': 'empty',
+            'referer': channel_url,
+            'accept-language': 'en-GB,en;q=0.9',
+        }
+        response = requests.get(taget_url, headers=headers)
+        if not response.ok:
             data_dict["ready"] = False
             return data_dict
-        video_entries = []
-        content_list = []
-        if not isinstance(content["feed"]["entry"], list):
-            content_list.append(content["feed"]["entry"])
-        else:
-            content_list = content["feed"]["entry"]
-        for entry in content_list:
-            video_entry = {}
-            video_entry["thumbnailUrl"] = entry["media:group"]["media:thumbnail"]["@url"]
-            video_entry["title"] = entry["title"]
-            video_entry["author"] = entry["author"]["name"]
-            video_entry["views"] = entry["media:group"]["media:community"]["media:statistics"]["@views"]
-            video_entry["createdAt"] = int(time.mktime(
-                datetime.fromisoformat(entry["published"]).timetuple())) * 1000
+        resp_json = response.json()
 
-            video_entry["videoUrl"] = entry["link"]["@href"]
-            video_entry["channelUrl"] = f"https://www.youtube.com/channel/{entry['yt:channelId']}"
+        # tab 1 - is for videos
+        videos_index = 0 if is_it_playlist else 1
+        videos = resp_json["response"]["contents"]["singleColumnBrowseResultsRenderer"]["tabs"][videos_index]
+        content = videos["tabRenderer"]["content"]["sectionListRenderer"]["contents"]
+        video_meta_list = content[0]["itemSectionRenderer"]["contents"]
+
+        if not is_it_playlist:
+            channel_name = resp_json["response"]["metadata"]["channelMetadataRenderer"]["title"]
+            channel_url = resp_json["response"]["metadata"]["channelMetadataRenderer"]["channelUrl"]
+        else:
+            channel_name = None
+
+        renderer_key = "playlistVideoRenderer" if is_it_playlist else "compactVideoRenderer"
+        if is_it_playlist:
+            video_meta_list = video_meta_list[0]["playlistVideoListRenderer"]["contents"]
+
+        video_entries = []
+        for entry in video_meta_list:
+            video_entry = {}
+            # the last item
+            if "continuationItemRenderer" in entry:
+                continue
+            video_meta = entry[renderer_key]
+            if is_it_playlist:
+                channel_name = video_meta["shortBylineText"]["runs"][0]["text"]
+                channel_id = video_meta["shortBylineText"]["runs"][0]["navigationEndpoint"]["browseEndpoint"]["browseId"]
+                channel_url = f"https://youtube.com/channel/{channel_id}"
+
+            video_entry["title"] = video_meta["title"]["runs"][0]["text"]
+            # there are 4 different sizes
+            video_entry["thumbnailUrl"] = video_meta["thumbnail"]["thumbnails"][1]["url"]
+            if not is_it_playlist:
+                video_entry["channelThumbnail"] = video_meta["channelThumbnail"]["thumbnails"][0]["url"]
+            if "publishedTimeText" in video_meta:
+                date_str = video_meta["publishedTimeText"]["runs"][0]["text"].lower(
+                )
+                date_str = date_str.replace("streamed", "").strip()
+                video_entry["createdAt"] = int(
+                    dateparser.parse(date_str).timestamp()) * 1000
+            if "viewCountText" in video_meta:
+                # 2,403 views
+                views_str = video_meta["viewCountText"]["runs"][0]["text"].split(" ")[
+                    0]
+                video_entry["views"] = int(views_str.replace(',', ''))
+            video_entry["videoUrl"] = f"https://www.youtube.com/watch?v={video_meta['videoId']}"
+            # 16:33
+            duration_str = video_meta["lengthText"]["runs"][0]["text"]
+            video_entry["duration"] = parsed_time_to_seconds(duration_str)
+
+            video_entry["channelUrl"] = channel_url
+            video_entry["author"] = channel_name
+
             video_entry["platform"] = self.YOUTUBE
             video_entries.append(video_entry)
         data_dict["content"] = video_entries

@@ -8,7 +8,7 @@ import re
 from loguru import logger
 
 
-from utils.util import get_xml_stream_as_json
+from utils.util import get_xml_stream_as_json, parsed_time_to_seconds
 
 
 class BitchuteProcessor:
@@ -168,13 +168,6 @@ class BitchuteProcessor:
         data_dict["content"] = video_entries if len(video_entries) else None
         return data_dict
 
-    def _parsed_time_to_seconds(self, human_time):
-        time_parts = human_time.split(":")
-        sum = 0
-        for count, part in enumerate(reversed(time_parts)):
-            part = int(part)
-            sum += part if count == 0 else part * pow(60, count)
-        return sum
 
     # Parse Bitchute "listing-popular" section
     def get_popular(self) -> dict:
@@ -201,7 +194,7 @@ class BitchuteProcessor:
                 "p", {"class": "video-card-title"}).a.text.strip()
             video_entry["author"] = block.find(
                 "p", {"class": "video-card-channel"}).a.text.strip()
-            video_entry["duration"] = self._parsed_time_to_seconds(
+            video_entry["duration"] = parsed_time_to_seconds(
                 block.find("span", {"class": "video-duration"}).text.strip())
 
             video_entry["createdAt"] = dateparser.parse(block.find(
