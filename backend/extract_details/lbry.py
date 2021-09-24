@@ -4,6 +4,7 @@ import urllib.parse
 import datetime
 from urllib.parse import unquote
 
+
 class LbryProcessor:
     """Class to process Lbry/Odysee videos and channels."""
 

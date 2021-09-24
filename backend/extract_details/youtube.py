@@ -12,7 +12,6 @@ import dateparser
 class YoutubeProcessor:
     """Class to process YouTube videos and channels."""
     YOUTUBE = "yt"
-    YOUTUBE_XML = "https://www.youtube.com/feeds/videos.xml"
     ydl_opts = {
         'format': 'best',
     }

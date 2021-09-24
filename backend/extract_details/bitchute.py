@@ -168,15 +168,16 @@ class BitchuteProcessor:
         data_dict["content"] = video_entries if len(video_entries) else None
         return data_dict
 
-
     # Parse Bitchute "listing-popular" section
+
     def get_popular(self) -> dict:
         data_dict = {}
         data_dict["ready"] = False
         data_dict["platform"] = self.BITCHUTE
         res = self.session.get(self.BITCHUTE_BASE, headers=self._headers)
         if not res.ok:
-            logger.debug(f"Failed to download bitchute popular\nReason: {res.reason}")
+            logger.debug(
+                f"Failed to download bitchute popular\nReason: {res.reason}")
             return data_dict
         soup = BeautifulSoup(res.text, 'html.parser')
         content_section = soup.find("div", {"id": "listing-popular"}).div

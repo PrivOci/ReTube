@@ -11,7 +11,7 @@ def get_xml_stream_as_json(xml_url, session=None):
     except requests.ConnectionError as e:
         logger.error(f"URL: {xml_url}\nerror:\n{e}")
         return None
-    except requests.Timeout  as e:
+    except requests.Timeout as e:
         logger.error(f"URL: {xml_url}\nerror:\n{e}")
         return None
     if req and not req.ok:
@@ -19,8 +19,11 @@ def get_xml_stream_as_json(xml_url, session=None):
         return None
     return xmltodict.parse(req.text)
 
-# 12:44 => number
+
 def parsed_time_to_seconds(human_time):
+    """
+    # 12:44 => number
+    """
     time_parts = human_time.split(":")
     sum = 0
     for count, part in enumerate(reversed(time_parts)):
