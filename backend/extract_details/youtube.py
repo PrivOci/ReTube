@@ -1,9 +1,7 @@
-from typing import Dict
 from youtubesearchpython import VideosSearch, ChannelsSearch
 import youtube_dl as yt
 from youtube_dl.utils import DownloadError
-from utils.util import get_xml_stream_as_json, parsed_time_to_seconds
-import time
+from utils.util import parsed_time_to_seconds
 from datetime import datetime
 import requests
 import dateparser

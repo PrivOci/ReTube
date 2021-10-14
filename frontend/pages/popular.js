@@ -5,7 +5,7 @@ export default function popular() {
   let [videoData, setVideoDataState] = useState();
 
   const fetchPopularVideos = async (setVideoDataState) => {
-    console.log("fetchPopularVideos");
+    console.log("fetching popular videos");
     const ytPromise = fetchVideos("yt_popular");
     const lbPromise = fetchVideos("lbry_popular");
     const bcPromise = fetchVideos("bitchute_popular");
