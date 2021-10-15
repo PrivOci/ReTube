@@ -8,24 +8,25 @@
     "start": "next start"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.35",
-    "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@fortawesome/react-fontawesome": "^0.1.14",
-    "@tailwindcss/aspect-ratio": "^0.2.0",
-    "humanize-duration": "^3.25.2",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.15",
+    "@tailwindcss/aspect-ratio": "^0.3.0",
+    "humanize-duration": "^3.27.0",
     "lodash": "^4.17.21",
-    "next": "10.2.0",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "next": "^11.1.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-json-view": "^1.21.3",
     "react-player": "^2.9.0",
-    "react-toast-notifications": "^2.4.4",
-    "swr": "^0.5.5",
-    "valtio": "^1.0.4"
+    "react-toast-notifications": "^2.5.1",
+    "swr": "^1.0.1",
+    "valtio": "^1.2.4",
+    "yarn-upgrade-all": "^0.5.4"
   },
   "devDependencies": {
-    "autoprefixer": "^10.2.5",
-    "postcss": "^8.2.13",
-    "tailwindcss": "^2.1.2"
+    "autoprefixer": "^10.3.7",
+    "postcss": "^8.3.9",
+    "tailwindcss": "^2.2.17"
   }
 }
