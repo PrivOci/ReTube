@@ -134,6 +134,17 @@ export const channelUrlDetails = (url) => {
   return details;
 };
 
+export const fetchJson = async (target_url, requestOptions) => {
+  // make sure there is / at the end
+  if (!target_url.endsWith("/")) {
+    target_url.concat("/");
+  }
+  const data = await fetch(target_url, requestOptions).then((response) =>
+    response.json()
+  );
+  return data;
+};
+
 export const fetchVideos = async (url) => {
   let [platform, id, api_url] = channelUrlDetails(url);
 
@@ -145,13 +156,7 @@ export const fetchVideos = async (url) => {
       id: id,
     }),
   };
-  if (!api_url.endsWith("/")){
-    api_url.concat("/");
-  }
-
-  const data = await fetch(api_url, requestOptions).then((response) =>
-    response.json()
-  );
+  const data = await fetchJson(api_url, requestOptions);
 
   if (data.ready === false) {
     console.log(`failed to get videos: ${url}`);
@@ -192,9 +197,7 @@ export const fetchSearchAPi = async (search_api_url, search_query) => {
     }),
   };
 
-  const data = fetch(search_api_url, requestOptions).then((response) =>
-    response.json()
-  );
+  const data = fetchJson(search_api_url, requestOptions);
 
   return data;
 };
@@ -217,9 +220,7 @@ export const checkSentence = async (str) => {
     }),
   };
 
-  const data = fetch(CHECK_GRAMMAR_API, requestOptions).then((response) =>
-    response.json()
-  );
+  const data = fetchJson(CHECK_GRAMMAR_API, requestOptions);
 
   return data;
 };
