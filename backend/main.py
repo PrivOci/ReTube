@@ -1,18 +1,18 @@
-from extract_details.youtube import YoutubeProcessor
+from datetime import datetime
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi_utils.tasks import repeat_every
+from loguru import logger
+from pydantic import BaseModel
+
+import utils.optimize as optimize
 from extract_details.bitchute import BitchuteProcessor
 from extract_details.lbry import LbryProcessor
 from extract_details.rumble import RumbleProcessor
+from extract_details.youtube import YoutubeProcessor
 from utils.spelling import ginger_check_sentence
-import utils.optimize as optimize
-
-from fastapi import FastAPI
-from fastapi_utils.tasks import repeat_every
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-from pydantic import BaseModel
-from datetime import datetime
-
-from loguru import logger
 
 app = FastAPI()
 bc_processor = BitchuteProcessor()
@@ -34,24 +34,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 YOUTUBE = "yt"
 LBRY = "lb"
 BITCHUTE = "bc"
 RUMBLE = "rb"
 
 
-class request_details(BaseModel):
+class RequestDetails(BaseModel):
     platform: str
     id: str
 
 
-class search_query(BaseModel):
+class SearchQuery(BaseModel):
     query: str
     max: int
 
 
-class just_string(BaseModel):
+class JustString(BaseModel):
     query: str
 
 
@@ -72,16 +71,15 @@ async def prefetch_channels(platform, channels, source_function) -> None:
     """
     Prefetch channels requested within a day, remove rest.
     """
-    details = {}
-    details["platform"] = platform
+    details = {"platform": platform}
     now = datetime.utcnow()
-    for (id, req_date) in channels.items():
-        details["id"] = id
+    for (channel_id, req_date) in channels.items():
+        details["channel_id"] = channel_id
         difference = now - req_date
         if difference.days != 0:
-            del channels[id]
+            del channels[channel_id]
             continue
-        logger.debug(f"prefetch: {details['id']} - {details['platform']}")
+        logger.debug(f"prefetch: {details['channel_id']} - {details['platform']}")
         await optimize.optimized_request(dict(details), source_function, 1, forced=True)
 
 
@@ -110,22 +108,21 @@ async def prefetch_rb_channels() -> None:
 
 
 @app.post("/api/check")
-async def check_sentence(just_string: just_string):
+async def check_sentence(just_string: JustString):
     return ginger_check_sentence(just_string.query)
 
 
 @app.post("/api/video/")
-async def get_video(details: request_details) -> dict:
+async def get_video(details: RequestDetails) -> dict:
     details.id = details.id.strip().strip("/")
     # YT video link expires
-    if (details.platform == YOUTUBE):
+    if details.platform == YOUTUBE:
         return get_video_from_source(dict(details))
     return await optimize.optimized_request(dict(details), get_video_from_source, 72)
 
 
 def get_video_from_source(details: dict) -> dict:
-    result = {}
-    result['ready'] = False
+    result = {'ready': False}
 
     # prepare video_url
     video_url = None
@@ -144,22 +141,22 @@ def get_video_from_source(details: dict) -> dict:
     if details["platform"] == YOUTUBE:
         result["platform"] = YOUTUBE
         result["content"] = yt_processor.get_video_details(video_url)
-        result['ready'] = result["content"] != None
+        result['ready'] = result["content"] is not None
         return result
     elif details["platform"] == BITCHUTE:
         result["platform"] = BITCHUTE
         result["content"] = bc_processor.get_video_details(video_url)
-        result['ready'] = result["content"] != None
+        result['ready'] = result["content"] is not None
         return result
     elif details["platform"] == LBRY:
         result["platform"] = LBRY
         result["content"] = lbry_processor.get_video_details(video_url)
-        result['ready'] = result["content"] != None
+        result['ready'] = result["content"] is not None
         return result
     elif details["platform"] == RUMBLE:
         result["platform"] = RUMBLE
         result["content"] = rb_processor.get_video_details(video_url)
-        result['ready'] = result["content"] != None
+        result['ready'] = result["content"] is not None
         return result
     else:
         return result
@@ -167,7 +164,7 @@ def get_video_from_source(details: dict) -> dict:
 
 # YouTube channel to JSON
 @app.post("/api/youtube/c/")
-async def get_youtube_channel(details: request_details) -> dict:
+async def get_youtube_channel(details: RequestDetails) -> dict:
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     details["channel"] = True
@@ -180,7 +177,7 @@ async def get_youtube_channel(details: request_details) -> dict:
 
 # YouTube playlist to JSON
 @app.post("/api/youtube/p/")
-async def get_youtube_playlist(details: request_details) -> dict:
+async def get_youtube_playlist(details: RequestDetails) -> dict:
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     if details["id"] == "popular":
@@ -194,7 +191,7 @@ async def get_youtube_playlist(details: request_details) -> dict:
 
 # search youtube videos
 @app.post("/api/youtube/search/")
-async def youtube_search_results(search_query: search_query) -> dict:
+async def youtube_search_results(search_query: SearchQuery) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = YOUTUBE
     result = await optimize.optimized_request(
@@ -206,7 +203,7 @@ async def youtube_search_results(search_query: search_query) -> dict:
 
 # search youtube channels
 @app.post("/api/youtube/channels/")
-async def youtube_search_channels(search_query: search_query) -> dict:
+async def youtube_search_channels(search_query: SearchQuery) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = YOUTUBE
     search_query["max"] = 3
@@ -219,7 +216,7 @@ async def youtube_search_channels(search_query: search_query) -> dict:
 
 # search Lbry channels
 @app.post("/api/lbry/channels/")
-async def lbry_search_channels(search_query: search_query) -> dict:
+async def lbry_search_channels(search_query: SearchQuery) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = LBRY
     search_query["max"] = 3
@@ -232,7 +229,7 @@ async def lbry_search_channels(search_query: search_query) -> dict:
 
 # search bitchute videos
 @app.post("/api/bitchute/search/")
-async def bitchute_search_results(search_query: search_query) -> dict:
+async def bitchute_search_results(search_query: SearchQuery) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = BITCHUTE
     result = await optimize.optimized_request(
@@ -244,7 +241,7 @@ async def bitchute_search_results(search_query: search_query) -> dict:
 
 # search youtube videos
 @app.post("/api/lbry/search/")
-async def lbry_search_results(search_query: search_query) -> dict:
+async def lbry_search_results(search_query: SearchQuery) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = LBRY
     result = await optimize.optimized_request(
@@ -256,7 +253,7 @@ async def lbry_search_results(search_query: search_query) -> dict:
 
 # search rumble videos
 @app.post("/api/rb/search/")
-async def rb_search_results(search_query: search_query) -> dict:
+async def rb_search_results(search_query: SearchQuery) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = RUMBLE
     result = await optimize.optimized_request(
@@ -268,7 +265,7 @@ async def rb_search_results(search_query: search_query) -> dict:
 
 # Lbry/Odysee channel to JSON
 @app.post("/api/lbry/c/")
-async def get_lbry_channel(details: request_details) -> dict:
+async def get_lbry_channel(details: RequestDetails) -> dict:
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     details["channel"] = True
@@ -287,7 +284,7 @@ def get_lbry_channel_source(details: dict) -> dict:
 
 # Rumble channel to JSON
 @app.post("/api/rb/c/")
-async def get_lbry_channel(details: request_details) -> dict:
+async def get_lbry_channel(details: RequestDetails) -> dict:
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     global_rb_urls[details["id"]] = datetime.utcnow()
@@ -299,7 +296,7 @@ async def get_lbry_channel(details: request_details) -> dict:
 
 # BitChute channel to JSON
 @app.post("/api/bitchute/c/")
-async def get_bitchute_channel(details: request_details):
+async def get_bitchute_channel(details: RequestDetails):
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")
     details["channel"] = True

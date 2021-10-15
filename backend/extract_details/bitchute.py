@@ -1,11 +1,11 @@
-import cloudscraper
-from bs4 import BeautifulSoup
-import urllib.parse
-import dateparser
-from datetime import datetime
 import re
-from loguru import logger
+import urllib.parse
+from datetime import datetime
 
+import cloudscraper
+import dateparser
+from bs4 import BeautifulSoup
+from loguru import logger
 
 from utils.util import get_xml_stream_as_json, parsed_time_to_seconds
 
@@ -23,7 +23,8 @@ class BitchuteProcessor:
         'dnt': '1',
         'x-requested-with': 'XMLHttpRequest',
         'sec-ch-ua-mobile': '?0',
-        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/14.04.6 Chrome/81.0.3990.0 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/14.04.6 '
+                      'Chrome/81.0.3990.0 Safari/537.36',
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'origin': 'https://www.bitchute.com',
         'sec-fetch-site': 'same-origin',
@@ -48,7 +49,7 @@ class BitchuteProcessor:
     def get_video_details(self, video_url) -> dict:
         req = self.session.get(video_url)
         if not req.ok:
-            return None
+            return {}
         soup = BeautifulSoup(req.text, 'html.parser')
 
         data = {
@@ -66,7 +67,7 @@ class BitchuteProcessor:
         publish_date = soup.find(
             "div", {"class": "video-publish-date"}).text.strip()
         splited_date = publish_date.split(" on ")[1].split()
-        date_result = f"{splited_date[0]} {re.sub('[^0-9]','', splited_date[1])} {splited_date[2]}"
+        date_result = f"{splited_date[0]} {re.sub('[^0-9]', '', splited_date[1])} {splited_date[2]}"
         publish_date = datetime.strptime(date_result, '%B %d %Y.').timestamp()
 
         video_details = {
@@ -75,7 +76,7 @@ class BitchuteProcessor:
             "description": soup.find(id="video-description").text,
             "author": soup.find("p", {"class": "owner"}).a.text,
             "channelUrl": "https://bitchute.com" +
-            soup.find("p", {"class": "name"}).a["href"],
+                          soup.find("p", {"class": "name"}).a["href"],
             "duration": "",
             "views": count_json["view_count"] if count_json else None,
             "likeCount": count_json["like_count"] if count_json else None,
@@ -88,13 +89,14 @@ class BitchuteProcessor:
         return video_details
 
     def _parse_bitchute_details(self, entry) -> dict:
-        video_entry = {}
-        video_entry["thumbnailUrl"] = entry["images"]["thumbnail"]
-        video_entry["title"] = entry["name"]
-        video_entry["author"] = entry["channel_name"]
-        video_entry["views"] = entry["views"]
-        date_formated = dateparser.parse(entry["published"])
-        video_entry["createdAt"] = date_formated.timestamp() * 1000
+        video_entry = {
+            "thumbnailUrl": entry["images"]["thumbnail"],
+            "title": entry["name"],
+            "author": entry["channel_name"],
+            "views": entry["views"]
+        }
+        date_formatted = dateparser.parse(entry["published"])
+        video_entry["createdAt"] = date_formatted.timestamp() * 1000
         video_entry["videoUrl"] = f"https://bitchute.com{entry['path']}"
         video_entry["duration"] = entry["duration"]
 
@@ -106,9 +108,10 @@ class BitchuteProcessor:
         max_results = search_query["max"]
         encoded_query = urllib.parse.quote(search_terms)
 
-        data_dict = {}
-        data_dict["platform"] = self.BITCHUTE
-        data_dict["ready"] = False
+        data_dict = {
+            "platform": self.BITCHUTE,
+            "ready": False
+        }
 
         data = {
             'csrfmiddlewaretoken': self.cookies['csrftoken'],
@@ -141,26 +144,27 @@ class BitchuteProcessor:
     def channel_data(self, details: dict) -> dict:
         if details['id'] == "popular":
             return self.get_popular()
-        data_dict = {}
-        data_dict["ready"] = False
-        data_dict["platform"] = self.BITCHUTE
+        data_dict = {
+            "ready": False,
+            "platform": self.BITCHUTE
+        }
         popular_rss_url = f"{self.BITCHUTE_XML}{details['id']}"
         content = get_xml_stream_as_json(popular_rss_url, session=self.session)
         if not content:
             return data_dict
         video_entries = []
         for entry in content["rss"]["channel"]["item"]:
-            video_entry = {}
-            video_entry["thumbnailUrl"] = entry["enclosure"]["@url"]
-            video_entry["title"] = entry["title"]
-            video_entry["author"] = details['id']
-            video_entry["views"] = ""
-            video_entry["createdAt"] = int(
-                dateparser.parse(entry["pubDate"]).timestamp()) * 1000
-            video_entry[
-                "videoUrl"] = f"https://www.bitchute.com/video/{entry['link'].split('/embed/')[1]}"
-            video_entry["platform"] = self.BITCHUTE
-            video_entry["channelUrl"] = f"https://www.bitchute.com/channel/{details['id']}"
+            video_entry = {
+                "thumbnailUrl": entry["enclosure"]["@url"],
+                "title": entry["title"],
+                "author": details['id'],
+                "views": "",
+                "createdAt": int(
+                    dateparser.parse(entry["pubDate"]).timestamp()) * 1000,
+                "videoUrl": f"https://www.bitchute.com/video/{entry['link'].split('/embed/')[1]}",
+                "platform": self.BITCHUTE,
+                "channelUrl": f"https://www.bitchute.com/channel/{details['id']}"
+            }
             video_entries.append(video_entry)
 
         data_dict["ready"] = True
@@ -170,9 +174,10 @@ class BitchuteProcessor:
     # Parse Bitchute "listing-popular" section
 
     def get_popular(self) -> dict:
-        data_dict = {}
-        data_dict["ready"] = False
-        data_dict["platform"] = self.BITCHUTE
+        data_dict = {
+            "ready": False,
+            "platform": self.BITCHUTE
+        }
         res = self.session.get(self.BITCHUTE_BASE, headers=self._headers)
         if not res.ok:
             logger.debug(

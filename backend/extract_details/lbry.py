@@ -1,7 +1,8 @@
-import requests
+import datetime
 import json
 import urllib.parse
-import datetime
+
+import requests
 
 
 class LbryProcessor:
@@ -73,15 +74,18 @@ class LbryProcessor:
         max_results = search_query["max"]
         encoded_query = urllib.parse.quote(search_terms)
 
-        data_dict = {}
-        data_dict["platform"] = self.LBRY
-        data_dict["ready"] = False
+        data_dict = {
+            "platform": self.LBRY,
+            "ready": False
+        }
         headers = {
             'Referer': 'https://odysee.com/',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537 (KHTML, like Gecko) Chrome/89 Safari/537',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537 (KHTML, like Gecko) Chrome/89 '
+                          'Safari/537',
         }
         response = self.session.get(
-            f'https://lighthouse.lbry.com/search?s={encoded_query}&mediaType=video&free_only=true&size={max_results}&from=0&nsfw=false', headers=headers)
+            f'https://lighthouse.lbry.com/search?s={encoded_query}&mediaType=video&free_only=true&size={max_results}&from=0&nsfw=false',
+            headers=headers)
         results_json = response.json()
         if not response.ok:
             # if no results
@@ -111,7 +115,9 @@ class LbryProcessor:
         if 'url' in entry["value"]["thumbnail"]:
             video_entry["thumbnailUrl"] = entry["value"]["thumbnail"]["url"]
         else:
-            video_entry["thumbnailUrl"] = "https://user-images.githubusercontent.com/74614193/112720980-68bab700-8ef9-11eb-9319-0e79508b6e7e.png"
+            video_entry[
+                "thumbnailUrl"] = "https://user-images.githubusercontent.com/74614193/112720980-68bab700-8ef9-11eb" \
+                                  "-9319-0e79508b6e7e.png "
         if "title" in entry["value"]:
             video_entry["title"] = entry["value"]["title"]
         else:
@@ -209,8 +215,7 @@ class LbryProcessor:
 
         data = response.json()
 
-        data_dict = {}
-        data_dict["platform"] = self.LBRY
+        data_dict = {"platform": self.LBRY}
         video_entries = []
         for entry in data["result"]["items"]:
             video_entry = self._parse_lbry_details(entry)
@@ -256,8 +261,7 @@ class LbryProcessor:
             return {}
         results_json = response.json()
 
-        data_dict = {}
-        data_dict["platform"] = self.LBRY
+        data_dict = {"platform": self.LBRY}
         video_entries = []
         for entry in results_json["result"]["items"]:
             video_entry = self._parse_lbry_details(entry)
@@ -269,11 +273,11 @@ class LbryProcessor:
         return data_dict
 
     def search_for_channels(self, search_query):
-        '''Searches for channels in Lbry.
+        """Searches for channels in Lbry.
 
         Args:
-            search_terms (str): search query.
-        '''
+            search_query (str): search query.
+        """
         channel_name = search_query["query"]
         max_results = search_query["max"]
         channel_name = channel_name.replace(" ", "").replace("+", "")
@@ -293,8 +297,7 @@ class LbryProcessor:
             'https://api.lbry.tv/api/v1/proxy?m=resolve', headers=self._headers, data=json.dumps(data))
         data = response.json()
 
-        data_dict = {}
-        data_dict["platform"] = self.LBRY
+        data_dict = {"platform": self.LBRY}
         video_entries = []
         for entry in data["result"]:
             current_entry = data["result"][entry]

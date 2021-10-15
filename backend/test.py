@@ -18,7 +18,8 @@ def test_get_video_yt():
     assert json_object["ready"] == True
     assert json_object["platform"] == 'yt'
     assert json_object["content"]["id"] == 'jNQXAC9IVRw'
-    assert json_object["content"]["description"] == 'The first video on YouTube. While you wait for Part 2, listen to this great song: https://www.youtube.com/watch?v=zj82_v2R6ts'
+    assert json_object["content"]["description"] == 'The first video on YouTube. While you wait for Part 2, listen to ' \
+                                                    'this great song: https://www.youtube.com/watch?v=zj82_v2R6ts '
     assert json_object["content"]["author"] == 'jawed'
     assert json_object["content"]["channelUrl"] == 'https://www.youtube.com/channel/UC4QobU6STFB0P71PMvOGN5A'
     assert json_object["content"]["title"] == 'Me at the zoo'

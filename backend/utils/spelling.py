@@ -1,5 +1,6 @@
-from gingerit.gingerit import GingerIt
 import urllib.parse
+
+from gingerit.gingerit import GingerIt
 
 parser = GingerIt()
 
@@ -17,5 +18,5 @@ def ginger_check_sentence(sentence):
     result = parser.parse(sentence)
     result_change = result["result"]
     changed = bool(len(result["corrections"])) and (
-        sentence.lower() != result_change.lower())
+            sentence.lower() != result_change.lower())
     return {"need_change": changed, "result": result_change}

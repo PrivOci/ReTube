@@ -1,7 +1,8 @@
+import urllib.parse
+
 import requests
 from bs4 import BeautifulSoup
 from loguru import logger
-import urllib.parse
 
 from utils.util import parsed_time_to_seconds, convert_str_to_number
 
@@ -14,12 +15,12 @@ class RumbleProcessor:
     def __init__(self) -> None:
         self.session = requests.Session()
 
-    def _get_video_entries(self, target_url) -> dict:
+    def _get_video_entries(self, target_url) -> list:
         res = self.session.get(target_url)
         if not res.ok:
             logger.debug(
                 f"Failed to download rumble channel meta\nReason: {res.reason}")
-            return None
+            return []
         soup = BeautifulSoup(res.text, 'html.parser')
         constrained_section = soup.find("div", "constrained")
         list_html = constrained_section.find("ol")
@@ -44,9 +45,10 @@ class RumbleProcessor:
         return video_entries
 
     def channel_data(self, details: dict) -> dict:
-        data_dict = {}
-        data_dict["ready"] = False
-        data_dict["platform"] = self.PLATFORM
+        data_dict = {
+            "ready": False,
+            "platform": self.PLATFORM
+        }
         if details['id'] == "popular":
             channel_url = "https://rumble.com/videos?sort=views&date=today"
         else:
@@ -60,9 +62,10 @@ class RumbleProcessor:
         max_results = search_query["max"]
         encoded_query = urllib.parse.quote(search_terms)
 
-        data_dict = {}
-        data_dict["ready"] = False
-        data_dict["platform"] = self.PLATFORM
+        data_dict = {
+            "ready": False,
+            "platform": self.PLATFORM
+        }
 
         videos_url = f"{self.RUMBLE_BASE}/search/video?q={encoded_query}"
         data_dict["ready"] = True
@@ -105,11 +108,11 @@ class RumbleProcessor:
         if not res.ok:
             logger.debug(
                 f"Failed to get rumble video source\nReason: {res.reason}")
-            return None
+            return {}
         meta_json = res.json()
 
         if meta_json["live"] == 1:
-            return None
+            return {}
 
         video_details = {
             "id": video_url.split(self.RUMBLE_BASE + "/")[1].strip().strip('.html'),

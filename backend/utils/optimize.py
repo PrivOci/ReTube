@@ -1,13 +1,14 @@
 import json
-import redis
+import socket
 import sys
 from datetime import timedelta
-import socket
+
+import redis
 
 DISABLE_CACHE = False
 
 
-def isOpen(ip, port):
+def is_open(ip, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         s.connect((ip, int(port)))
@@ -18,18 +19,18 @@ def isOpen(ip, port):
 
 
 def redis_connect() -> redis.client.Redis:
-    host = "localhost" if isOpen("localhost", 6379) else "redis"
+    host = "localhost" if is_open("localhost", 6379) else "redis"
     try:
-        client = redis.Redis(
+        redis_client = redis.Redis(
             host=host,
             port=6379,
             password="retube",
             db=0,
             socket_timeout=5,
         )
-        ping = client.ping()
+        ping = redis_client.ping()
         if ping is True:
-            return client
+            return redis_client
     except redis.AuthenticationError:
         print("AuthenticationError")
         sys.exit(1)
@@ -38,21 +39,19 @@ def redis_connect() -> redis.client.Redis:
 client = redis_connect()
 
 
-def set_cache(key: str, value: str, hours = 24) -> bool:
+def set_cache(key: str, value: str, hours=24) -> bool:
     """Data to redis - 1 hour"""
-
-    state = client.setex(key, timedelta(hours=hours), value=value,)
+    state = client.setex(key, timedelta(hours=hours), value=value, )
     return state
+
 
 async def get_from_cache(key: str) -> str:
     """Data from redis."""
-
     val = client.get(key)
     return val
 
 
 async def optimized_request(details, get_from_source, hours=24, forced=False):
-
     key_for_redis = json.dumps(details)
     # First it looks for the data in redis cache
     data = await get_from_cache(key_for_redis) if not DISABLE_CACHE else None
@@ -72,7 +71,7 @@ async def optimized_request(details, get_from_source, hours=24, forced=False):
             }
 
         # This block sets saves the respose to redis and serves it directly
-        if data.get("ready") == True:
+        if data.get("ready"):
             data["cache"] = False
             state = set_cache(key_for_redis, json.dumps(data), hours)
 

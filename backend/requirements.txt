@@ -11,3 +11,4 @@ yt_dlp
 gingerit
 loguru
 cloudscraper
+pydantic

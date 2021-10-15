@@ -1,10 +1,12 @@
-from youtubesearchpython import VideosSearch, ChannelsSearch
-import yt_dlp as yt
-from yt_dlp.utils import DownloadError
-from utils.util import parsed_time_to_seconds, convert_str_to_number
 from datetime import datetime
-import requests
+
 import dateparser
+import requests
+import yt_dlp as yt
+from youtubesearchpython import VideosSearch, ChannelsSearch
+from yt_dlp.utils import DownloadError
+
+from utils.util import parsed_time_to_seconds, convert_str_to_number
 
 
 class YoutubeProcessor:
@@ -24,9 +26,9 @@ class YoutubeProcessor:
                 video_url, download=False)
         except DownloadError as err:
             print(err)
-            return None
+            return {}
         if meta["is_live"]:
-            return None
+            return {}
 
         video_details = {
             "id": f"{meta['id']}",
@@ -50,8 +52,7 @@ class YoutubeProcessor:
         max_results = search_query["max"]
 
         results_json = VideosSearch(search_words, limit=max_results)
-        data_dict = {}
-        data_dict["platform"] = self.YOUTUBE
+        data_dict = {"platform": self.YOUTUBE}
         video_entries = []
         for video in results_json.result()["result"]:
             video_entry = {}
@@ -71,17 +72,16 @@ class YoutubeProcessor:
         return data_dict
 
     def search_for_channels(self, search_query):
-        '''Searches for channels in YouTube.
+        """Searches for channels in YouTube.
 
         Args:
-            search_terms (str): search query.
-        '''
+            search_query (str): search query.
+        """
         search_words = search_query["query"]
         max_results = search_query["max"]
         search_result = ChannelsSearch(
             search_words, limit=max_results).result()
-        data_dict = {}
-        data_dict["platform"] = self.YOUTUBE
+        data_dict = {"platform": self.YOUTUBE}
         channel_entries = []
         for channel in search_result["result"]:
             channel_entry = {}
@@ -124,7 +124,8 @@ class YoutubeProcessor:
         headers = {
             'authority': 'm.youtube.com',
             'x-youtube-sts': '18892',
-            'x-youtube-device': 'cbr=Edge+Chromium&cbrand=google&cbrver=93.0.961.52&ceng=WebKit&cengver=537.36&cmodel=pixel+2+xl&cos=Android&cosver=8.0.0&cplatform=MOBILE&cyear=2017',
+            'x-youtube-device': 'cbr=Edge+Chromium&cbrand=google&cbrver=93.0.961.52&ceng=WebKit&cengver=537.36&cmodel'
+                                '=pixel+2+xl&cos=Android&cosver=8.0.0&cplatform=MOBILE&cyear=2017',
             'x-youtube-page-label': 'youtube.mobile.web.client_20210923_00_RC00',
             'sec-ch-ua-arch': '',
             'sec-ch-ua-platform-version': '"8.0.0"',
@@ -135,7 +136,8 @@ class YoutubeProcessor:
             'x-youtube-time-zone': 'Europe/London',
             'sec-ch-ua-platform': '"Android"',
             'sec-ch-ua-mobile': '?1',
-            'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
+            'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 ('
+                          'KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36 Edg/93.0.961.52',
             'sec-ch-ua-full-version': '"93.0.961.52"',
             'x-youtube-client-name': '2',
             'x-youtube-client-version': '2.20210923.00.00',
@@ -178,7 +180,8 @@ class YoutubeProcessor:
             video_meta = entry[renderer_key]
             if is_it_playlist:
                 channel_name = video_meta["shortBylineText"]["runs"][0]["text"]
-                channel_id = video_meta["shortBylineText"]["runs"][0]["navigationEndpoint"]["browseEndpoint"]["browseId"]
+                channel_id = video_meta["shortBylineText"]["runs"][0]["navigationEndpoint"]["browseEndpoint"][
+                    "browseId"]
                 channel_url = f"https://youtube.com/channel/{channel_id}"
 
             video_entry["title"] = video_meta["title"]["runs"][0]["text"]
