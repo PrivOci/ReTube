@@ -20,16 +20,13 @@ lbry_processor = LbryProcessor()
 
 # optimize.DISABLE_CACHE = True
 
-# testing
-origins = [
-    "http://localhost:3000",
-    "http://localhost:3033",
-    "http://localhost:8080",
-]
+ALLOWED_HOSTS = None
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ALLOWED_HOSTS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

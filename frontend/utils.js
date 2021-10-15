@@ -145,6 +145,10 @@ export const fetchVideos = async (url) => {
       id: id,
     }),
   };
+  if (!api_url.endsWith("/")){
+    api_url.concat("/");
+  }
+
   const data = await fetch(api_url, requestOptions).then((response) =>
     response.json()
   );
