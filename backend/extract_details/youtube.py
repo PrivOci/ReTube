@@ -1,7 +1,7 @@
 from youtubesearchpython import VideosSearch, ChannelsSearch
 import yt_dlp as yt
 from yt_dlp.utils import DownloadError
-from utils.util import parsed_time_to_seconds
+from utils.util import parsed_time_to_seconds, convert_str_to_number
 from datetime import datetime
 import requests
 import dateparser
@@ -85,6 +85,10 @@ class YoutubeProcessor:
         channel_entries = []
         for channel in search_result["result"]:
             channel_entry = {}
+            if channel["subscribers"]:
+                sub_count_str = channel["subscribers"].split(" ")[0]
+                channel_entry["subscriberCount"] = convert_str_to_number(
+                    sub_count_str)
             channel_entry["isChannel"] = True
             channel_entry["id"] = channel["id"]
             thumb = channel["thumbnails"][-1]["url"]

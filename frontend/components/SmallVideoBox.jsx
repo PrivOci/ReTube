@@ -81,7 +81,7 @@ const ChannelThumbnail = ({ item }) => {
           {platform}
         </p>
       </a>
-      <SubscribeButton channel_url={item.channelUrl} />
+      <SubscribeButton channel_url={item.channelUrl} count={item.subscriberCount} />
       <a href={`channel?url=${item.channelUrl}`} alt="video source">
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>
