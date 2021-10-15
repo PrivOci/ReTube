@@ -1,31 +1,25 @@
 import requests
 from bs4 import BeautifulSoup
 from loguru import logger
+import urllib.parse
 
 from utils.util import parsed_time_to_seconds, convert_str_to_number
 
 
 class RumbleProcessor:
     """Class to process Rumble videos and channels."""
-    PLATFORM = "RB"
+    PLATFORM = "rb"
     RUMBLE_BASE = "https://rumble.com"
 
     def __init__(self) -> None:
         self.session = requests.Session()
 
-    def channel_data(self, details: dict) -> dict:
-        data_dict = {}
-        data_dict["ready"] = False
-        data_dict["platform"] = self.PLATFORM
-        if details['id'] == "popular":
-          channel_url = "https://rumble.com/videos?sort=views&date=today"
-        else:
-          channel_url = f"{self.RUMBLE_BASE}/c/{details['id']}"
-        res = self.session.get(channel_url)
+    def _get_video_entries(self, target_url)-> dict:
+        res = self.session.get(target_url)
         if not res.ok:
             logger.debug(
                 f"Failed to download rumble channel meta\nReason: {res.reason}")
-            return data_dict
+            return None
         soup = BeautifulSoup(res.text, 'html.parser')
         constrained_section = soup.find("div", "constrained")
         list_html = constrained_section.find("ol")
@@ -47,10 +41,34 @@ class RumbleProcessor:
 
             video_entry["platform"] = self.PLATFORM
             video_entries.append(video_entry)
-
+        return video_entries
+    
+    def channel_data(self, details: dict) -> dict:
+        data_dict = {}
+        data_dict["ready"] = False
+        data_dict["platform"] = self.PLATFORM
+        if details['id'] == "popular":
+            channel_url = "https://rumble.com/videos?sort=views&date=today"
+        else:
+            channel_url = f"{self.RUMBLE_BASE}/c/{details['id']}"
         data_dict["ready"] = True
-        data_dict["content"] = video_entries
+        data_dict["content"] = self._get_video_entries(channel_url)
         return data_dict
+
+    def search_for_videos(self, search_query) -> dict:
+        search_terms = search_query["query"]
+        max_results = search_query["max"]
+        encoded_query = urllib.parse.quote(search_terms)
+        
+        data_dict = {}
+        data_dict["ready"] = False
+        data_dict["platform"] = self.PLATFORM
+        
+        videos_url = f"{self.RUMBLE_BASE}/search/video?q={encoded_query}"
+        data_dict["ready"] = True
+        data_dict["content"] = self._get_video_entries(videos_url)
+        return data_dict
+        
 
     def get_video_details(self, video_url) -> dict:
         html_page = self.session.get(video_url).text
@@ -78,9 +96,8 @@ class RumbleProcessor:
         subs_count_span = soup.find(
             "span", "subscribe-button-count")
         if subs_count_span:
-          subs_count_str = subs_count_span.text.strip()
-          subs_count = convert_str_to_number(subs_count_str)
-        
+            subs_count_str = subs_count_span.text.strip()
+            subs_count = convert_str_to_number(subs_count_str)
 
         # get direct video source
         # https://rumble.com/embedJS/u3/?request=video&ver=2&v=video_id

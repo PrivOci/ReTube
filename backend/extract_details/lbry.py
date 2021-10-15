@@ -2,7 +2,6 @@ import requests
 import json
 import urllib.parse
 import datetime
-from urllib.parse import unquote
 
 
 class LbryProcessor:
@@ -143,7 +142,7 @@ class LbryProcessor:
         return video_entry
 
     def get_video_details(self, video_url):
-        video_url = unquote(video_url)
+        video_url = urllib.parse.unquote(video_url)
         lbry_url = self._normal_to_lbry_url(video_url)
 
         video_url = self._get_video_url(lbry_url)

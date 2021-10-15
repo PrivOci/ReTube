@@ -254,6 +254,18 @@ async def lbry_search_results(search_query: search_query) -> dict:
     return result
 
 
+# search rumble videos
+@app.post("/api/rb/search/")
+async def rb_search_results(search_query: search_query) -> dict:
+    search_query = dict(search_query)
+    search_query["platform"] = RUMBLE
+    result = await optimize.optimized_request(
+        dict(search_query),
+        rb_processor.search_for_videos,
+        1)
+    return result
+
+
 # Lbry/Odysee channel to JSON
 @app.post("/api/lbry/c/")
 async def get_lbry_channel(details: request_details) -> dict:
