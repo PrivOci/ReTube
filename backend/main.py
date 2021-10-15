@@ -1,6 +1,7 @@
 from extract_details.youtube import YoutubeProcessor
 from extract_details.bitchute import BitchuteProcessor
 from extract_details.lbry import LbryProcessor
+from extract_details.rumble import RumbleProcessor
 from utils.spelling import ginger_check_sentence
 import utils.optimize as optimize
 
@@ -17,8 +18,9 @@ app = FastAPI()
 bc_processor = BitchuteProcessor()
 yt_processor = YoutubeProcessor()
 lbry_processor = LbryProcessor()
+rb_processor = RumbleProcessor()
 
-# optimize.DISABLE_CACHE = True
+optimize.DISABLE_CACHE = True
 
 ALLOWED_HOSTS = None
 if not ALLOWED_HOSTS:
@@ -36,6 +38,7 @@ app.add_middleware(
 YOUTUBE = "yt"
 LBRY = "lb"
 BITCHUTE = "bc"
+RUMBLE = "rb"
 
 
 class request_details(BaseModel):
@@ -55,12 +58,14 @@ class just_string(BaseModel):
 LB_VIDEO_URL = "https://odysee.com/"
 YT_VIDEO_URL = "https://www.youtube.com/watch?v="
 BT_VIDEO_URL = "https://www.bitchute.com/video/"
+RB_VIDEO_URL = "https://rumble.com/"
 
 # global list of channel URLs to prefetch them each hour.
 # Only prefetched recently requested URLs
 global_yt_urls = {}
 global_lbry_urls = {}
 global_bc_urls = {}
+global_rb_urls = {}
 
 
 async def prefetch_channels(platform, channels, source_function) -> None:
@@ -98,6 +103,12 @@ async def prefetch_bc_channels() -> None:
     await prefetch_channels(BITCHUTE, global_bc_urls, bc_processor.channel_data)
 
 
+@app.on_event("startup")
+@repeat_every(seconds=60 * 50)  # 50 mins
+async def prefetch_rb_channels() -> None:
+    await prefetch_channels(RUMBLE, global_rb_urls, rb_processor.channel_data)
+
+
 @app.post("/api/check")
 async def check_sentence(just_string: just_string):
     return ginger_check_sentence(just_string.query)
@@ -124,6 +135,8 @@ def get_video_from_source(details: dict) -> dict:
         video_url = YT_VIDEO_URL + details["id"]
     elif details["platform"] == BITCHUTE:
         video_url = BT_VIDEO_URL + details["id"]
+    elif details["platform"] == RUMBLE:
+        video_url = RB_VIDEO_URL + details["id"] + ".html"
     else:
         return result
 
@@ -141,6 +154,11 @@ def get_video_from_source(details: dict) -> dict:
     elif details["platform"] == LBRY:
         result["platform"] = LBRY
         result["content"] = lbry_processor.get_video_details(video_url)
+        result['ready'] = result["content"] != None
+        return result
+    elif details["platform"] == RUMBLE:
+        result["platform"] = RUMBLE
+        result["content"] = rb_processor.get_video_details(video_url)
         result['ready'] = result["content"] != None
         return result
     else:
@@ -253,6 +271,18 @@ def get_lbry_channel_source(details: dict) -> dict:
     if details['id'] == "popular":
         return lbry_processor.get_popular()
     return lbry_processor.channel_data(details['id'])
+
+
+# Rumble channel to JSON
+@app.post("/api/rb/c/")
+async def get_lbry_channel(details: request_details) -> dict:
+    details = dict(details)
+    details["id"] = details["id"].strip().strip("/")
+    global_rb_urls[details["id"]] = datetime.utcnow()
+    return await optimize.optimized_request(
+        dict(details),
+        rb_processor.channel_data,
+        1)
 
 
 # BitChute channel to JSON
