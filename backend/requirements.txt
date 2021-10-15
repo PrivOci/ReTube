@@ -7,7 +7,7 @@ xmltodict
 dateparser
 redis
 youtube-search-python
-youtube_dl
+yt_dlp
 gingerit
 loguru
 cloudscraper

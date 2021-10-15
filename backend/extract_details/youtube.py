@@ -1,6 +1,6 @@
 from youtubesearchpython import VideosSearch, ChannelsSearch
-import youtube_dl as yt
-from youtube_dl.utils import DownloadError
+import yt_dlp as yt
+from yt_dlp.utils import DownloadError
 from utils.util import parsed_time_to_seconds
 from datetime import datetime
 import requests

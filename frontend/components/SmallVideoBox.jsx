@@ -35,7 +35,8 @@ const VideoThumbnail = ({ item }) => {
           <img
             src={item.thumbnailUrl}
             alt="thumbnail"
-            className="object-center rounded-xl mb-1 transition duration-300 ease-in-out hover:opacity-75"
+            className="object-cover w-full h-56 mb-5 bg-center rounded transition duration-300 ease-in-out hover:opacity-75"
+            loading="lazy"
           />
           <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute left-2 bottom-2 bg-opacity-50">
             {`${timeSince(item.createdAt)} ago`}
