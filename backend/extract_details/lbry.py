@@ -54,10 +54,7 @@ class LbryProcessor:
         response = self.session.post(
             'https://api.lbry.tv/api/v1/proxy?m=get', headers=self._headers, data=json.dumps(data))
         data = response.json()
-        if not "result" in data:
-            return None
-        streaming_url = data["result"]["streaming_url"]
-        return streaming_url
+        return data["result"]["streaming_url"] if "result" in data else None
 
     def _normal_to_lbry_url(self, normal_url):
         # lbry/odysee URL to lbry api accessible format

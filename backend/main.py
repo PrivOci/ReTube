@@ -20,7 +20,7 @@ yt_processor = YoutubeProcessor()
 lbry_processor = LbryProcessor()
 rb_processor = RumbleProcessor()
 
-optimize.DISABLE_CACHE = True
+# optimize.DISABLE_CACHE = True
 
 ALLOWED_HOSTS = None
 if not ALLOWED_HOSTS:

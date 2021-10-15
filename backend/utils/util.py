@@ -2,6 +2,7 @@ import requests
 import xmltodict
 from loguru import logger
 
+from itertools import count
 
 def get_xml_stream_as_json(xml_url, session=None):
     if not session:
@@ -25,11 +26,9 @@ def parsed_time_to_seconds(human_time):
     # 12:44 => number
     """
     time_parts = human_time.split(":")
-    sum = 0
-    for count, part in enumerate(reversed(time_parts)):
-        part = int(part)
-        sum += part if count == 0 else part * pow(60, count)
-    return sum
+    part_to_seconds = lambda part, order: int(part) * pow(60, order)
+    return sum(map(part_to_seconds, reversed(time_parts), count()))    
+
 
 def convert_str_to_number(x):
     total_stars = 0

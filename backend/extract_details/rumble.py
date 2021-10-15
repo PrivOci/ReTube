@@ -14,7 +14,7 @@ class RumbleProcessor:
     def __init__(self) -> None:
         self.session = requests.Session()
 
-    def _get_video_entries(self, target_url)-> dict:
+    def _get_video_entries(self, target_url) -> dict:
         res = self.session.get(target_url)
         if not res.ok:
             logger.debug(
@@ -42,7 +42,7 @@ class RumbleProcessor:
             video_entry["platform"] = self.PLATFORM
             video_entries.append(video_entry)
         return video_entries
-    
+
     def channel_data(self, details: dict) -> dict:
         data_dict = {}
         data_dict["ready"] = False
@@ -59,16 +59,15 @@ class RumbleProcessor:
         search_terms = search_query["query"]
         max_results = search_query["max"]
         encoded_query = urllib.parse.quote(search_terms)
-        
+
         data_dict = {}
         data_dict["ready"] = False
         data_dict["platform"] = self.PLATFORM
-        
+
         videos_url = f"{self.RUMBLE_BASE}/search/video?q={encoded_query}"
         data_dict["ready"] = True
         data_dict["content"] = self._get_video_entries(videos_url)
         return data_dict
-        
 
     def get_video_details(self, video_url) -> dict:
         html_page = self.session.get(video_url).text
