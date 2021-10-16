@@ -71,6 +71,10 @@ export const cleanUpUrl = (url) => {
     return `lbry:${url.split("odysee.com/")[1]}`;
   } else if (lowerCaseUrl.includes("bitchute.com/video/")) {
     return `bt:${_.trim(url.split("/video/")[1], "/")}`;
+  } else if (lowerCaseUrl.includes("rumble.com/")) {
+    let rb_id = _.trim(url.split("rumble.com/")[1], "/");
+    rb_id = _.trim(rb_id, ".html");
+    return `rb:${rb_id}`;
   }
   return url;
 };
@@ -90,7 +94,7 @@ export const videoUrlDetails = (url) => {
     details[1] = _.trim(url.split("/video/")[1], "/");
   } else if (url.includes("rumble.com/")) {
     details[0] = RUBMLE;
-    details[1] = url.split("rumble.com/")[1]
+    details[1] = url.split("rumble.com/")[1];
   }
   details[2] = `${BACKEND_URL}/api/video/`;
   return details;
@@ -126,7 +130,6 @@ export const channelUrlDetails = (url) => {
     details[0] = RUBMLE;
     details[1] = "popular";
     details[2] = `${RUBMLE_API}/c`;
-
   } else if (url.includes("youtube.com/")) {
     details[0] = YOUTUBE;
     details[1] = url.split("/channel/")[1];

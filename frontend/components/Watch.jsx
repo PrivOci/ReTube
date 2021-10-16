@@ -38,7 +38,7 @@ const Watch = () => {
   const router = useRouter();
 
   // TODO: standartize original URL (targetUrl)
-  let targetUrl = router.asPath.split("url=")[1].replace("https://www.", "");
+  let targetUrl = router.asPath.split("url=")[1];
   let [platform, id] = videoUrlDetails(targetUrl);
   
   console.log(`watch: p:${platform} id:${id}`);

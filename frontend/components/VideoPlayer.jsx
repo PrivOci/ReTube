@@ -24,6 +24,9 @@ const descriptionBox = (description) => {
 };
 
 const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
+  if (!originalUrl.startsWith("http")){
+    originalUrl = "https://" + originalUrl;
+  }
   const platformName = platforms[platform];
   const watchedProxy = useSnapshot(dbWatched);
   const playerOnProgress = ({ played }) => {
@@ -89,7 +92,7 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
             )}
             <button
               className="items-center shadow bg-red-500 mt-2 px-4 py-2 text-white hover:bg-red-400 rounded-lg"
-              onClick={() => window.open("https://" + originalUrl, "_blank")}
+              onClick={() => window.open(originalUrl, "_blank")}
             >
               Watch On {platformName}
             </button>
