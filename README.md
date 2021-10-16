@@ -3,6 +3,8 @@ Access videos from `YouTube`, `Lbry/Odysee`, and `Bitchute` from one place. \
 No account, no ads, no tracking. \
 Subscriptions are saved locally in [`LocalStorage`](https://javascript.info/localstorage) (TODO: Optional `Sync`)
 
+Mirrored at Gitlab: https://gitlab.com/PrivOci/ReTube
+
 # DEMO
 [![DEMO](https://user-images.githubusercontent.com/74867724/112172240-736d0780-8bec-11eb-97a8-61b1a7e9eba4.png)](https://streamable.com/zx1cpu)
 
