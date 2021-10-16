@@ -37,10 +37,12 @@ const fetchSubsVideos = async (subsStore, setVideoDataState) => {
     allSubsWait.push(fetchVideos(bcUrl));
   });
   // rumble
-  subsStore.rumble.forEach((item, index) => {
-    const rbUrl = `https://rumble.com/${item}`;
-    allSubsWait.push(fetchVideos(rbUrl));
-  });
+  if ("rumble" in subsStore) {
+    subsStore.rumble.forEach((item, index) => {
+      const rbUrl = `https://rumble.com/${item}`;
+      allSubsWait.push(fetchVideos(rbUrl));
+    });
+  }
 
   for (const waitSub of allSubsWait) {
     if (waitSub === null) {
