@@ -9,6 +9,7 @@ export default function popular() {
     const ytPromise = fetchVideos("yt_popular");
     const lbPromise = fetchVideos("lbry_popular");
     const bcPromise = fetchVideos("bitchute_popular");
+    const rbPromise = fetchVideos("rb_popular");
 
     let allPopular = {};
     allPopular.platform = "all";
@@ -34,6 +35,15 @@ export default function popular() {
     if (bcResults) {
       allPopular.content = allPopular.content.concat(
         bcResults.content.slice(1, 10)
+      );
+      setVideoDataState();
+      setVideoDataState(allPopular);
+    }
+
+    const rbResults = await rbPromise;
+    if (rbResults) {
+      allPopular.content = allPopular.content.concat(
+        rbResults.content.slice(1, 10)
       );
       setVideoDataState();
       setVideoDataState(allPopular);

@@ -9,6 +9,8 @@ import VideoPlayer from "./VideoPlayer";
 import { videoUrlDetails } from "../utils";
 
 const VIDEO_API = "api/video/";
+// TODO: extract
+const BACKEND_ADDR = "http://localhost:8000";
 
 const fetchVideoMetaSWR = async (platform_id) => {
   const { platform, id } = JSON.parse(platform_id);
@@ -21,7 +23,7 @@ const fetchVideoMetaSWR = async (platform_id) => {
       id: id,
     }),
   };
-  return fetch(`http://localhost:8000/${VIDEO_API}`, requestOptions)
+  return fetch(`${BACKEND_ADDR}/${VIDEO_API}`, requestOptions)
     .then((response) => response.json())
     .then((data) => {
       if (data.ready === false) {
@@ -38,7 +40,7 @@ const Watch = () => {
   // TODO: standartize original URL (targetUrl)
   let targetUrl = router.asPath.split("url=")[1].replace("https://www.", "");
   let [platform, id] = videoUrlDetails(targetUrl);
-
+  
   console.log(`watch: p:${platform} id:${id}`);
   const { data } = useSWR(JSON.stringify({ platform, id }), fetchVideoMetaSWR, {
     revalidateOnFocus: false,

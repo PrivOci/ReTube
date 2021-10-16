@@ -36,6 +36,11 @@ const fetchSubsVideos = async (subsStore, setVideoDataState) => {
     const bcUrl = `https://www.bitchute.com/channel/${item}`;
     allSubsWait.push(fetchVideos(bcUrl));
   });
+  // rumble
+  subsStore.rumble.forEach((item, index) => {
+    const rbUrl = `https://rumble.com/${item}`;
+    allSubsWait.push(fetchVideos(rbUrl));
+  });
 
   for (const waitSub of allSubsWait) {
     if (waitSub === null) {

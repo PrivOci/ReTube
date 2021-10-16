@@ -5,7 +5,9 @@ from bs4 import BeautifulSoup
 from loguru import logger
 
 from utils.util import parsed_time_to_seconds, convert_str_to_number
+import dateutil.parser as dp
 
+# TODO: search for channels
 
 class RumbleProcessor:
     """Class to process Rumble videos and channels."""
@@ -31,16 +33,36 @@ class RumbleProcessor:
             video_entry = {}
             article = block.article
 
+            # channel
+            channel_id = article.find("a", {"rel": "author"})["href"]
+
+            # duration
+            duration_span = article.find(
+                "span", {"class": "video-item--duration"})["data-value"].strip()
+
+            # views
+            views_count = None
+            if "video-item--meta video-item--views" in article.text:
+                views_span = article.find(
+                    "span", {"class": "video-item--meta video-item--views"})["data-value"].strip()
+                views_count = int(views_span.replace(",", ""))
+
+            # date
+            date_span = article.find(
+                "time", {"class": "video-item--meta video-item--time"})["datetime"].strip()
+            parsed_time = dp.parse(date_span)
+            time_in_seconds = int(parsed_time.timestamp()) * 1000
+
             # TODO(me): use utc bytes of str
             video_entry["title"] = article.h3.text.strip()
             video_entry["thumbnailUrl"] = article.a.img["src"]
             video_entry["videoUrl"] = f"{self.RUMBLE_BASE}{article.a['href']}"
             video_entry["author"] = article.footer.a.text.strip()
-            duration = article.footer.find(
-                "span", {"class": "video-item--duration"})["data-value"].strip()
-            video_entry["duration"] = parsed_time_to_seconds(duration)
-
+            video_entry["duration"] = parsed_time_to_seconds(duration_span)
+            video_entry["views"] = views_count
             video_entry["platform"] = self.PLATFORM
+            video_entry["createdAt"] = time_in_seconds
+            video_entry["channelUrl"] = f"{self.RUMBLE_BASE}{channel_id}"
             video_entries.append(video_entry)
         return video_entries
 
@@ -52,14 +74,16 @@ class RumbleProcessor:
         if details['id'] == "popular":
             channel_url = "https://rumble.com/videos?sort=views&date=today"
         else:
-            channel_url = f"{self.RUMBLE_BASE}/c/{details['id']}"
+            channel_url = f"{self.RUMBLE_BASE}/{details['id']}"
+        if not details["id"]:
+            return {}
         data_dict["ready"] = True
         data_dict["content"] = self._get_video_entries(channel_url)
         return data_dict
 
     def search_for_videos(self, search_query) -> dict:
         search_terms = search_query["query"]
-        max_results = search_query["max"]
+        # max_results = search_query["max"]
         encoded_query = urllib.parse.quote(search_terms)
 
         data_dict = {
@@ -113,6 +137,8 @@ class RumbleProcessor:
 
         if meta_json["live"] == 1:
             return {}
+        parsed_time = dp.parse(meta_json["pubDate"])
+        time_in_seconds = int(parsed_time.timestamp()) * 1000
 
         video_details = {
             "id": video_url.split(self.RUMBLE_BASE + "/")[1].strip().strip('.html'),
@@ -126,7 +152,7 @@ class RumbleProcessor:
             # "dislikeCount": ,
             "subscriberCount": subs_count if subs_count else None,
             "thumbnailUrl": meta_json["i"],
-            # "createdAt": meta_json["pubData"],
+            "createdAt": time_in_seconds,
             "streamUrl": meta_json["u"]["mp4"]["url"],
         }
         return video_details

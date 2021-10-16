@@ -9,6 +9,7 @@ import {
   LBRY_SEARCH,
   LBRY_SEARCH_CHANNELS,
   BITCHUTE_SEARCH,
+  RUMBLE_SEARCH,
 } from "../utils";
 import VideoBoard from "../components/VideoBoard";
 export default function search() {
@@ -25,6 +26,7 @@ export default function search() {
     allWait.push(fetchSearchAPi(YOUTUBE_SEARCH, searchQuery));
     allWait.push(fetchSearchAPi(LBRY_SEARCH, searchQuery));
     allWait.push(fetchSearchAPi(BITCHUTE_SEARCH, searchQuery));
+    allWait.push(fetchSearchAPi(RUMBLE_SEARCH, searchQuery));
     let allSearch = {};
     allSearch.platform = "search";
     allSearch.ready = false;

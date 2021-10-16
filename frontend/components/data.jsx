@@ -5,6 +5,7 @@ export const subscriptions = proxy(
     youtube: [],
     lbry: [],
     bitchute: [],
+    rumble: [],
   }
 );
 

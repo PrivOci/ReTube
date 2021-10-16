@@ -20,7 +20,7 @@ yt_processor = YoutubeProcessor()
 lbry_processor = LbryProcessor()
 rb_processor = RumbleProcessor()
 
-# optimize.DISABLE_CACHE = True
+optimize.DISABLE_CACHE = True
 
 ALLOWED_HOSTS = None
 if not ALLOWED_HOSTS:
@@ -74,7 +74,7 @@ async def prefetch_channels(platform, channels, source_function) -> None:
     details = {"platform": platform}
     now = datetime.utcnow()
     for (channel_id, req_date) in channels.items():
-        details["channel_id"] = channel_id
+        details["id"] = channel_id
         difference = now - req_date
         if difference.days != 0:
             del channels[channel_id]
@@ -252,7 +252,7 @@ async def lbry_search_results(search_query: SearchQuery) -> dict:
 
 
 # search rumble videos
-@app.post("/api/rb/search/")
+@app.post("/api/rumble/search/")
 async def rb_search_results(search_query: SearchQuery) -> dict:
     search_query = dict(search_query)
     search_query["platform"] = RUMBLE
@@ -283,7 +283,7 @@ def get_lbry_channel_source(details: dict) -> dict:
 
 
 # Rumble channel to JSON
-@app.post("/api/rb/c/")
+@app.post("/api/rumble/c/")
 async def get_lbry_channel(details: RequestDetails) -> dict:
     details = dict(details)
     details["id"] = details["id"].strip().strip("/")

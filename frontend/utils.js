@@ -6,13 +6,16 @@ const BACKEND_URL = "http://localhost:8000";
 const YT_API = `${BACKEND_URL}/api/youtube`;
 const LBRY_API = `${BACKEND_URL}/api/lbry`;
 const BITCHUTE_API = `${BACKEND_URL}/api/bitchute`;
+const RUBMLE_API = `${BACKEND_URL}/api/rumble`;
 
 export const YOUTUBE_SEARCH = `${BACKEND_URL}/api/youtube/search/`;
 export const LBRY_SEARCH = `${BACKEND_URL}/api/lbry/search/`;
 export const BITCHUTE_SEARCH = `${BACKEND_URL}/api/bitchute/search/`;
+export const RUMBLE_SEARCH = `${BACKEND_URL}/api/rumble/search/`;
 
 export const YOUTUBE_SEARCH_CHANNELS = `${BACKEND_URL}/api/youtube/channels`;
 export const LBRY_SEARCH_CHANNELS = `${BACKEND_URL}/api/lbry/channels`;
+export const RUMBLE_SEARCH_CHANNELS = `${BACKEND_URL}/api/rumble/channels`;
 
 const CHECK_GRAMMAR_API = `${BACKEND_URL}/api/check`;
 
@@ -20,6 +23,7 @@ const CHECK_GRAMMAR_API = `${BACKEND_URL}/api/check`;
 const YOUTUBE = "yt";
 const LBRY = "lb";
 const BITCHUTE = "bc";
+const RUBMLE = "rb";
 
 const shortEnglishHumanizer = humanizeDuration.humanizer({
   language: "shortEn",
@@ -40,6 +44,7 @@ export const platforms = {
   yt: "YouTube",
   lb: "Lbry",
   bc: "BitChute",
+  rb: "Rubmle",
 };
 
 export const removeFromList = (myList, item) => {
@@ -83,6 +88,9 @@ export const videoUrlDetails = (url) => {
   } else if (url.includes("bitchute.com/video/")) {
     details[0] = BITCHUTE;
     details[1] = _.trim(url.split("/video/")[1], "/");
+  } else if (url.includes("rumble.com/")) {
+    details[0] = RUBMLE;
+    details[1] = url.split("rumble.com/")[1]
   }
   details[2] = `${BACKEND_URL}/api/video/`;
   return details;
@@ -114,6 +122,11 @@ export const channelUrlDetails = (url) => {
     details[0] = BITCHUTE;
     details[1] = "popular";
     details[2] = `${BITCHUTE_API}/c`;
+  } else if (url === "rb_popular") {
+    details[0] = RUBMLE;
+    details[1] = "popular";
+    details[2] = `${RUBMLE_API}/c`;
+
   } else if (url.includes("youtube.com/")) {
     details[0] = YOUTUBE;
     details[1] = url.split("/channel/")[1];
@@ -130,6 +143,11 @@ export const channelUrlDetails = (url) => {
     details[0] = BITCHUTE;
     details[1] = _.trim(url.split("/channel/")[1], "/");
     details[2] = `${BITCHUTE_API}/c`;
+  } else if (url.includes("rumble.com/")) {
+    console.log(url);
+    details[0] = RUBMLE;
+    details[1] = _.trim(url.split("rumble.com/")[1], "/");
+    details[2] = `${RUBMLE_API}/c`;
   }
   return details;
 };
@@ -137,8 +155,9 @@ export const channelUrlDetails = (url) => {
 export const fetchJson = async (target_url, requestOptions) => {
   // make sure there is / at the end
   if (!target_url.endsWith("/")) {
-    target_url.concat("/");
+    target_url = target_url.concat("/");
   }
+  console.log(target_url);
   const data = await fetch(target_url, requestOptions).then((response) =>
     response.json()
   );
@@ -183,7 +202,6 @@ export const fetchPopularVideos = async () => {
     .concat((await bcPromise).content.slice(1, 10));
 
   allPopular.ready = true;
-  console.log(allPopular);
   return allPopular;
 };
 
@@ -227,7 +245,7 @@ export const checkSentence = async (str) => {
 
 export const fetchSearchResults = async (search_query) => {
   console.log(`searching: ${search_query}`);
-  const check_query = check_sentence(search_query);
+  const check_query = checkSentence(search_query);
 
   let allWait = [];
   allWait.push(fetchSearchAPi(YOUTUBE_SEARCH_CHANNELS, search_query));

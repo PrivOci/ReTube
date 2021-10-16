@@ -1,3 +1,4 @@
+import { conforms } from "lodash";
 import React, { useState, useEffect } from "react";
 import { useSnapshot } from "valtio";
 import { channelUrlDetails, removeFromList } from "../utils";
@@ -8,6 +9,7 @@ import { subscriptions } from "./data";
 const YOUTUBE = "yt";
 const LBRY = "lb";
 const BITCHUTE = "bc";
+const RUMBLE = "rb";
 
 const IsSubscribed = (subsReadOnly, channel_url) => {
   let [platform, id] = channelUrlDetails(channel_url);
@@ -19,6 +21,9 @@ const IsSubscribed = (subsReadOnly, channel_url) => {
       return subsReadOnly.bitchute.includes(id);
     case LBRY:
       return subsReadOnly.lbry.includes(id);
+    case RUMBLE:
+      if ("rumble" in subsReadOnly) return subsReadOnly.rumble.includes(id);
+      else return false;
     default:
       return false;
   }
@@ -41,10 +46,8 @@ const SubscribeButton = ({ channel_url, count }) => {
         switch (platform) {
           case YOUTUBE:
             if (subsReadOnly.youtube.includes(id)) {
-              console.log("removing " + id);
               removeFromList(subscriptions.youtube, id);
             } else {
-              console.log("adding " + id);
               subscriptions.youtube.push(id);
             }
             break;
@@ -62,9 +65,24 @@ const SubscribeButton = ({ channel_url, count }) => {
               subscriptions.lbry.push(id);
             }
             break;
+          case RUMBLE:
+            // if existing db doesn't support rumbe
+            if (subscriptions.rumble === undefined) {
+              subscriptions.rumble = [];
+              subscriptions.rumble.push(id);
+            } else {
+              if (subsReadOnly.rumble.includes(id)) {
+                removeFromList(subscriptions.rumble, id);
+              } else {
+                subscriptions.rumble.push(id);
+              }
+            }
+            break;
+
           default:
             return false;
         }
+        console.log("updating subscriptions");
         localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
       }}
     >
