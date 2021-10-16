@@ -37,7 +37,6 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
   // prefetch channel since next/link not working here
   useSWR([details.channelUrl, undefined], fetchDataSWR);
 
-  console.log(details);
   return (
     <div className="grid grid-cols-1">
       <div className="shadow-lg justify-center rounded-2xl p-4 bg-white dark:bg-gray-700 w-full">

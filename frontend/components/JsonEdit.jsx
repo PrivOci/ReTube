@@ -22,7 +22,6 @@ const JsonEdit = () => {
         }}
         onAdd={() => {}}
         onEdit={(edit) => {
-          console.log(edit);
           if (typeof edit.new_value !== String) {
             return false;
           }

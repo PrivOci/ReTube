@@ -20,7 +20,6 @@ const Settings = () => {
 
   const { addToast } = useToasts();
   const handleSubmissionYouTube = async () => {
-    console.log(selectedFileYT);
     const fileContent = await selectedFileYT.text();
     const jsonContent = JSON.parse(fileContent);
     // prepare list
@@ -46,7 +45,6 @@ const Settings = () => {
   };
 
   const handleSubmissionRT = async () => {
-    console.log(selectedFileRT);
     const fileContent = await selectedFileRT.text();
 
     const jsonContent = JSON.parse(fileContent);
@@ -77,7 +75,6 @@ const Settings = () => {
   };
 
   const handleSubmissionBT = async () => {
-    console.log(selectedFileBT);
     // https://www.bitchute.com/subscriptions/
     const fileContent = await selectedFileBT.text();
 

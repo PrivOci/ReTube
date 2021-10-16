@@ -144,7 +144,6 @@ export const channelUrlDetails = (url) => {
     details[1] = _.trim(url.split("/channel/")[1], "/");
     details[2] = `${BITCHUTE_API}/c`;
   } else if (url.includes("rumble.com/")) {
-    console.log(url);
     details[0] = RUBMLE;
     details[1] = _.trim(url.split("rumble.com/")[1], "/");
     details[2] = `${RUBMLE_API}/c`;
@@ -157,7 +156,6 @@ export const fetchJson = async (target_url, requestOptions) => {
   if (!target_url.endsWith("/")) {
     target_url = target_url.concat("/");
   }
-  console.log(target_url);
   const data = await fetch(target_url, requestOptions).then((response) =>
     response.json()
   );
