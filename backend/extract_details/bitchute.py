@@ -201,7 +201,9 @@ class BitchuteProcessor:
                 "p", {"class": "video-card-channel"}).a.text.strip()
             video_entry["duration"] = parsed_time_to_seconds(
                 block.find("span", {"class": "video-duration"}).text.strip())
-
+            channel_id = block.find(
+                "p", {"class": "video-card-channel"}).a["href"]
+            video_entry["channelUrl"] = f"{self.BITCHUTE_BASE}{channel_id}"
             video_entry["createdAt"] = dateparser.parse(block.find(
                 "p", {"class": "video-card-published"}).text.strip()).timestamp() * 1000
             video_entry["videoUrl"] = f'{self.BITCHUTE_BASE}{block.find("a", href=True)["href"].strip()}'
