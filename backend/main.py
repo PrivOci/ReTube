@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import uvicorn
+import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
@@ -20,7 +21,15 @@ yt_processor = YoutubeProcessor()
 lbry_processor = LbryProcessor()
 rb_processor = RumbleProcessor()
 
-# optimize.DISABLE_CACHE = True
+
+def debugger_is_active() -> bool:
+    """Return if the debugger is currently active"""
+    gettrace = getattr(sys, 'gettrace', lambda: None)
+    return gettrace() is not None
+
+
+# Disable caching when debugged
+optimize.DISABLE_CACHE = debugger_is_active()
 
 ALLOWED_HOSTS = None
 if not ALLOWED_HOSTS:
@@ -79,7 +88,8 @@ async def prefetch_channels(platform, channels, source_function) -> None:
         if difference.days != 0:
             del channels[channel_id]
             continue
-        logger.debug(f"prefetch: {details['channel_id']} - {details['platform']}")
+        logger.debug(
+            f"prefetch: {details['channel_id']} - {details['platform']}")
         await optimize.optimized_request(dict(details), source_function, 1, forced=True)
 
 
