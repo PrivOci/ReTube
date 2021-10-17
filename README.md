@@ -1,5 +1,7 @@
 # ReTube
-Access videos from `YouTube`, `Lbry/Odysee`, `Bitchute`, and `Rumble` from one place. \
+An alternative front-end to `YouTube`, `Odysee/Lbry`, `Bitchute`, `Rumble`, etc.
+
+Access all videos from one place. \
 No account, no ads, no tracking. \
 Subscriptions are saved locally in [`LocalStorage`](https://javascript.info/localstorage) (TODO: Optional `Sync`)
 
