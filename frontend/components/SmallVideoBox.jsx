@@ -3,7 +3,7 @@ import {
   platforms,
   humanizeDurationSec,
   timeSince,
-  cleanUpUrl,
+  getIdFromVideo,
 } from "../utils";
 import Skeleton from "./Skeleton";
 import WatchedSymbol from "./WatchedSymbol";
@@ -21,7 +21,7 @@ const VideoThumbnail = ({ item }) => {
     const proxy_data = require("./data");
     const dbWatched = snapshot(proxy_data.dbWatched);
     if (item.videoUrl) {
-      const watchUrl = cleanUpUrl(item.videoUrl);
+      const watchUrl = getIdFromVideo(item.videoUrl);
       if (dbWatched.links.includes(watchUrl)) {
         setIsWatched(true);
       }

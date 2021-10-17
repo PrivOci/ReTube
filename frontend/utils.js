@@ -59,44 +59,50 @@ export const humanizeDurationSec = (sec) => {
 };
 
 /**
- * Removes "https://www" and trailing "/".
  * Used to save watched video URLs;
  * @param {string} url video url
  */
-export const cleanUpUrl = (url) => {
-  const lowerCaseUrl = url.toLowerCase();
-  if (lowerCaseUrl.includes("youtube.com")) {
-    return `yt:${_.trim(url.split("watch?v=")[1], "/")}`;
-  } else if (lowerCaseUrl.includes("odysee.com/")) {
-    return `lbry:${url.split("odysee.com/")[1]}`;
-  } else if (lowerCaseUrl.includes("bitchute.com/video/")) {
-    return `bt:${_.trim(url.split("/video/")[1], "/")}`;
-  } else if (lowerCaseUrl.includes("rumble.com/")) {
-    let rb_id = _.trim(url.split("rumble.com/")[1], "/");
-    rb_id = _.trim(rb_id, ".html");
-    return `rb:${rb_id}`;
+export const getIdFromVideo = (url) => {
+  const details = videoUrlDetails(url);
+  switch (details[0]) {
+    case YOUTUBE:
+      return `yt:${details[1]}`;
+    case LBRY:
+      return `lbry:${details[1]}`;
+    case BITCHUTE:
+      return `bt:${details[1]}`;
+    case RUBMLE:
+      return `rb:${details[1]}`;
+    default:
+      return null;
   }
-  return url;
 };
 
 export const videoUrlDetails = (url) => {
   url = _.trim(url, "/");
-  console.log(url);
+  const parsedUrl = new URL(url);
+  const href_parsed = new URL(parsedUrl.href);
+
   let details = [];
-  if (url.includes("youtube.com")) {
+  if (parsedUrl.hostname.toLowerCase().includes("youtube.com")) {
+    const ytId = href_parsed.searchParams.get("v");
     details[0] = YOUTUBE;
-    details[1] = url.split("watch?v=")[1];
-  } else if (url.includes("odysee.com/")) {
+    details[1] = ytId;
+  } else if (parsedUrl.hostname.toLowerCase().includes("odysee.com")) {
+    const lbryId = _.trim(href_parsed.pathname, "/");
     details[0] = LBRY;
-    details[1] = url.split("odysee.com/")[1];
-  } else if (url.includes("bitchute.com/video/")) {
+    details[1] = lbryId;
+  } else if (parsedUrl.hostname.toLowerCase().includes("bitchute.com")) {
+    const bcId = _.trim(href_parsed.pathname, "/video/");
     details[0] = BITCHUTE;
-    details[1] = _.trim(url.split("/video/")[1], "/");
-  } else if (url.includes("rumble.com/")) {
+    details[1] = bcId;
+  } else if (parsedUrl.hostname.toLowerCase().includes("rumble.com")) {
+    const rbId_pre = _.trim(href_parsed.pathname, "/");
+    const rbId = _.trim(rbId_pre, ".hmtl");
     details[0] = RUBMLE;
-    details[1] = url.split("rumble.com/")[1];
+    details[1] = rbId;
   }
-  details[2] = `${BACKEND_URL}/api/video/`;
+
   return details;
 };
 
@@ -118,19 +124,27 @@ export const channelUrlDetails = (url) => {
     details[0] = YOUTUBE;
     details[1] = "popular";
     details[2] = `${YT_API}/p`;
+    return details;
   } else if (url === "lbry_popular") {
     details[0] = LBRY;
     details[1] = "popular";
     details[2] = `${LBRY_API}/c`;
+    return details;
   } else if (url === "bitchute_popular") {
     details[0] = BITCHUTE;
     details[1] = "popular";
     details[2] = `${BITCHUTE_API}/c`;
+    return details;
   } else if (url === "rb_popular") {
     details[0] = RUBMLE;
     details[1] = "popular";
     details[2] = `${RUBMLE_API}/c`;
-  } else if (url.includes("youtube.com/")) {
+    return details;
+  } 
+  
+  // TODO(me): fix this, the funciton name is misleading
+  // channels
+  if (url.includes("youtube.com/")) {
     details[0] = YOUTUBE;
     details[1] = url.split("/channel/")[1];
     details[2] = `${YT_API}/c`;

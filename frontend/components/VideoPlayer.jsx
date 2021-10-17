@@ -1,6 +1,6 @@
 import React from "react";
 import ReactPlayer from "react-player";
-import { platforms, timeSince, fetchDataSWR, cleanUpUrl } from "../utils";
+import { platforms, timeSince, fetchDataSWR, getIdFromVideo } from "../utils";
 import useSWR from "swr";
 
 import { dbWatched } from "./data";
@@ -31,7 +31,7 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
   const watchedProxy = useSnapshot(dbWatched);
   const playerOnProgress = ({ played }) => {
     if (played > 0.9) {
-      dbWatched.links.push(cleanUpUrl(originalUrl));
+      dbWatched.links.push(getIdFromVideo(originalUrl));
       dbWatched.links = [...new Set(dbWatched.links)];
       localStorage.setItem("watched", JSON.stringify(dbWatched));
     }
@@ -75,7 +75,7 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
                 details.createdAt
               )} ago`}
             </span>
-            {watchedProxy.links.includes(cleanUpUrl(originalUrl)) ? (
+            {watchedProxy.links.includes(getIdFromVideo(originalUrl)) ? (
               <WatchedSymbol withDot={true} />
             ) : (
               <span />
