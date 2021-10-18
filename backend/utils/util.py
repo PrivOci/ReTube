@@ -1,6 +1,7 @@
 from itertools import count
 
 import requests
+import socket
 import xmltodict
 from loguru import logger
 
@@ -43,3 +44,18 @@ def convert_str_to_number(x):
         if len(x) > 1:
             total_stars = float(x[:-1]) * num_map.get(x[-1].upper(), 1)
     return int(total_stars)
+
+
+def is_connected():
+    REMOTE_SERVER = "one.one.one.one"
+    try:
+        # see if we can resolve the host name -- tells us if there is
+        # a DNS listening
+        host = socket.gethostbyname(REMOTE_SERVER)
+        # connect to the host -- tells us if the host is actually
+        # reachable
+        s = socket.create_connection((host, 80), 2)
+        s.close()
+        return True
+    except:
+        pass

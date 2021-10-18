@@ -5,8 +5,9 @@ import requests
 import yt_dlp as yt
 from youtubesearchpython import VideosSearch, ChannelsSearch
 from yt_dlp.utils import DownloadError
+from loguru import logger
 
-from utils.util import parsed_time_to_seconds, convert_str_to_number
+from utils.util import parsed_time_to_seconds, convert_str_to_number, is_connected
 
 
 class YoutubeProcessor:
@@ -24,10 +25,10 @@ class YoutubeProcessor:
 
     def get_video_details(self, video_url) -> dict:
         try:
-            meta = self.ydl.extract_info(
-                video_url, download=False)
+            meta = self.ydl.extract_info(video_url, download=False)
         except DownloadError as err:
-            print(err)
+            logger.debug(f"Internet Conected: {is_connected()}")
+            logger.debug(f"Failed to extract YT info\nReason: {err}")
             return {}
         if meta["is_live"]:
             return {}
@@ -166,15 +167,16 @@ class YoutubeProcessor:
             data_dict["ready"] = False
             return data_dict
         resp_json = response.json()
-        
+
         # header
         if not is_it_playlist:
             header = resp_json["response"]["header"]["c4TabbedHeaderRenderer"]
             subscriber_count = None
             if "subscriberCountText" in header:
-                sub_count_str = header["subscriberCountText"]["runs"][0]["text"].split(" ")[0]
+                sub_count_str = header["subscriberCountText"]["runs"][0]["text"].split(" ")[
+                    0]
                 subscriber_count = convert_str_to_number(sub_count_str)
-            
+
             data_dict["channel_meta"] = {
                 "title": header["title"],
                 "channelUrl": f"https://youtube.com/channel/{header['channelId']}",
@@ -228,7 +230,7 @@ class YoutubeProcessor:
                 views_str = video_meta["viewCountText"]["runs"][0]["text"].split(" ")[
                     0]
                 # No views
-                if views_str == "No": 
+                if views_str == "No":
                     views_str = "0"
                 video_entry["views"] = int(views_str.replace(',', ''))
             video_entry["videoUrl"] = f"https://www.youtube.com/watch?v={video_meta['videoId']}"
