@@ -19,8 +19,6 @@ services:
     build: ./backend
     ports:
       - "8000:80"
-    dns:
-      - 9.9.9.9
     depends_on:
       - redis
     restart: unless-stopped
