@@ -35,10 +35,10 @@ class RumbleProcessor:
             title = constrained_section.find(
                 "h1", {"class": "listing-header--title"}).text
             banner_src = constrained_section.find(
-                    "img", {"class": "listing-header--backsplash-img"})
+                "img", {"class": "listing-header--backsplash-img"})
             banner = banner_src["src"] if banner_src else None
             avatar_src = constrained_section.find(
-                    "img", {"class": "listing-header--thumb"})
+                "img", {"class": "listing-header--thumb"})
             avatar = avatar_src["src"] if avatar_src else None
             # subscriber count
             subscriber_count = None
@@ -65,7 +65,9 @@ class RumbleProcessor:
 
             # duration
             duration_span = article.find(
-                "span", {"class": "video-item--duration"})["data-value"].strip()
+                "span", {"class": "video-item--duration"})
+            duration_span_value = duration_span["data-value"].strip(
+            ) if duration_span else None
 
             # views
             views_count = None
@@ -85,7 +87,8 @@ class RumbleProcessor:
             video_entry["thumbnailUrl"] = article.a.img["src"]
             video_entry["videoUrl"] = f"{self.RUMBLE_BASE}{article.a['href']}"
             video_entry["author"] = article.footer.a.text.strip()
-            video_entry["duration"] = parsed_time_to_seconds(duration_span)
+            video_entry["duration"] = parsed_time_to_seconds(
+                duration_span_value) if duration_span_value else None
             video_entry["views"] = views_count
             video_entry["platform"] = self.PLATFORM
             video_entry["createdAt"] = time_in_seconds
@@ -163,13 +166,21 @@ class RumbleProcessor:
             return {}
         meta_json = res.json()
 
-        if meta_json["live"] == 1:
-            return {}
+        is_live = False
+        if meta_json["live"] != 0:
+            is_live = True
+
         parsed_time = dp.parse(meta_json["pubDate"])
         time_in_seconds = int(parsed_time.timestamp()) * 1000
 
+        if is_live:
+            video_format = "hls"
+        else:
+            video_format = "mp4"
+
         video_details = {
             "id": video_url.split(self.RUMBLE_BASE + "/")[1].strip().strip('.html'),
+            "isLive": is_live,
             "title": meta_json["title"],
             "description": video_description,
             "author": meta_json["author"]["name"],
@@ -181,6 +192,6 @@ class RumbleProcessor:
             "subscriberCount": subs_count if subs_count else None,
             "thumbnailUrl": meta_json["i"],
             "createdAt": time_in_seconds,
-            "streamUrl": meta_json["u"]["mp4"]["url"],
+            "streamUrl": meta_json["u"][video_format]["url"],
         }
         return video_details

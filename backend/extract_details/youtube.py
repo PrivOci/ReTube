@@ -2,7 +2,7 @@ from datetime import datetime
 
 import dateparser
 import requests
-import yt_dlp as yt
+from pytube import YouTube
 from youtubesearchpython import VideosSearch, ChannelsSearch
 from yt_dlp.utils import DownloadError
 from loguru import logger
@@ -24,30 +24,28 @@ class YoutubeProcessor:
         self.session = requests.Session()
 
     def get_video_details(self, video_url) -> dict:
-        try:
-            meta = self.ydl.extract_info(video_url, download=False)
-        except DownloadError as err:
-            logger.debug(f"Internet Conected: {is_connected()}")
-            logger.debug(f"Failed to extract YT info\nReason: {err}")
-            return {}
-        if meta["is_live"]:
-            return {}
+        return self._get_video_details_pytube(video_url)
 
+    def _get_video_details_pytube(self, video_url) -> dict:
+        """
+        Extract video meta using pytube
+        """
+
+        yt_object = YouTube(video_url)
+        video_url_obj = yt_object.streams.filter(
+            progressive=True, file_extension='mp4').order_by("resolution").desc().first()
         video_details = {
-            "id": f"{meta['id']}",
-            "description": f"{meta['description']}",
-            "author": f"{meta['uploader']}",
-            "duration": f"{meta['duration']}",
-            "views": int(meta['view_count']),
-            "likeCount": f"{meta['like_count']}" if "like_count" in meta else "",
-            "dislikeCount": f"{meta['dislike_count']}" if "dislike_count" in meta else "",
-            "title": f"{meta['title']}",
-            "thumbnailUrl": f"{meta['thumbnail']}",
-            "streamUrl": f"{meta['url']}",
-            "createdAt": int(datetime.strptime(meta["upload_date"], '%Y%m%d').timestamp()) * 1000,
-            "channelUrl": f"{meta['channel_url']}",
+            "id": yt_object.video_id,
+            "title": yt_object.title,
+            "streamUrl": video_url_obj.url,
+            "description": yt_object.description,
+            "author": yt_object.author,
+            "duration": yt_object.length,
+            "views": yt_object.views,
+            "thumbnailUrl": yt_object.thumbnail_url,
+            "channelUrl": yt_object.channel_url,
+            "createdAt": yt_object.publish_date.timestamp() * 1000,
         }
-        # post-processing
         return video_details
 
     def search_video(self, search_query):

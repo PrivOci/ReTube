@@ -27,6 +27,8 @@ def parsed_time_to_seconds(human_time):
     """
     # 12:44 => number
     """
+    if not human_time:
+        return None
     time_parts = human_time.split(":")
 
     def part_to_seconds(part, order): return int(part) * pow(60, order)
