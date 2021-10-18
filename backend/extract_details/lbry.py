@@ -216,6 +216,15 @@ class LbryProcessor:
         data = response.json()
 
         data_dict = {"platform": self.LBRY}
+
+        data_dict["channel_meta"] = {
+            "title": channel_details["value"]["title"],
+            "channelUrl": channel_url,
+            "banner": channel_details["value"]["cover"]["url"],
+            "avatar": channel_details["value"]["thumbnail"]["url"],
+            "subscriberCount": None
+        }
+
         video_entries = []
         for entry in data["result"]["items"]:
             video_entry = self._parse_lbry_details(entry)
