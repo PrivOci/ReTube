@@ -14,6 +14,8 @@ class YoutubeProcessor:
     YOUTUBE = "yt"
     ydl_opts = {
         'format': 'best',
+        # force to use ipv4
+        'source_address': '0.0.0.0',
     }
 
     def __init__(self) -> None:
