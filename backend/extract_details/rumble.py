@@ -34,10 +34,12 @@ class RumbleProcessor:
         if parse_channel_meta and not "rumble.com/videos" in target_url:
             title = constrained_section.find(
                 "h1", {"class": "listing-header--title"}).text
-            banner = constrained_section.find(
-                "img", {"class": "listing-header--backsplash-img"})["src"]
-            avatar = constrained_section.find(
-                "img", {"class": "listing-header--thumb"})["src"]
+            banner_src = constrained_section.find(
+                    "img", {"class": "listing-header--backsplash-img"})
+            banner = banner_src["src"] if banner_src else None
+            avatar_src = constrained_section.find(
+                    "img", {"class": "listing-header--thumb"})
+            avatar = avatar_src["src"] if avatar_src else None
             # subscriber count
             subscriber_count = None
             subs_count_span = soup.find(
