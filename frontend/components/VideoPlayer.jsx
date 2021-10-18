@@ -7,6 +7,7 @@ import { dbWatched } from "./data";
 import { useSnapshot } from "valtio";
 import WatchedSymbol from "./WatchedSymbol";
 import dynamic from "next/dynamic";
+import ButtonLive from "./BadgeLive";
 const SubscribeButton = dynamic(() => import("./SubscribeButton"), {
   ssr: false,
 });
@@ -24,7 +25,7 @@ const descriptionBox = (description) => {
 };
 
 const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
-  if (!originalUrl.startsWith("http")){
+  if (!originalUrl.startsWith("http")) {
     originalUrl = "https://" + originalUrl;
   }
   const platformName = platforms[platform];
@@ -39,7 +40,6 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
 
   // prefetch channel since next/link not working here
   useSWR([details.channelUrl, undefined], fetchDataSWR);
-
   return (
     <div className="grid grid-cols-1">
       <div className="shadow-lg justify-center rounded-2xl p-4 bg-white dark:bg-gray-700 w-full">
@@ -54,7 +54,10 @@ const VideoPlayer = ({ videoProps, details, platform, originalUrl }) => {
         </div>
         <div className="pt-3">
           <h3 className="mr-10 text-lg truncate-2nd text-black dark:text-white antialiased sm:subpixel-antialiased md:antialiased">
-            {details.title}
+            <div className="flex">
+              {details.title}
+              {details.isLive ? <ButtonLive /> : ""}
+            </div>
           </h3>
           <p className="font-medium text-gray-600 dark:text-gray-300 hover:text-gray-400">
             <a href={`/channel?url=${details.channelUrl}`}>{details.author}</a>

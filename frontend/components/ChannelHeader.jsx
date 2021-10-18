@@ -7,7 +7,6 @@ const SubscribeButton = dynamic(() => import("./SubscribeButton"), {
 });
 
 const ChannelHeader = ({ data }) => {
-  console.log(data);
   return (
     <div>
       {/* show banner if there is one */}

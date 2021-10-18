@@ -9,6 +9,7 @@ import Skeleton from "./Skeleton";
 import WatchedSymbol from "./WatchedSymbol";
 import { snapshot } from "valtio";
 import dynamic from "next/dynamic";
+import ButtonLive from "./BadgeLive";
 const SubscribeButton = dynamic(() => import("./SubscribeButton"), {
   ssr: false,
 });
@@ -41,9 +42,15 @@ const VideoThumbnail = ({ item }) => {
           <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute left-2 bottom-2 bg-opacity-50">
             {item.createdAt ? `${timeSince(item.createdAt)} ago` : ""}
           </span>
-          <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute right-2 bottom-2 bg-opacity-50">
-            {humanizeDurationSec(item.duration)}
-          </span>
+          {item.isLive ? (
+            <span className="text-whitetext-xs absolute right-2 bottom-2">
+              <ButtonLive />
+            </span>
+          ) : (
+            <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute right-2 bottom-2 bg-opacity-50">
+              {humanizeDurationSec(item.duration)}
+            </span>
+          )}
           {isWatched ? (
             <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute left-2 top-2 bg-opacity-50">
               <WatchedSymbol withDot={false} />

@@ -69,6 +69,11 @@ class RumbleProcessor:
             duration_span_value = duration_span["data-value"].strip(
             ) if duration_span else None
 
+            is_live = False
+            live_span = article.find("span", {"class": "video-item--live"})
+            if live_span:
+                is_live = True
+            
             # views
             views_count = None
             if "video-item--meta video-item--views" in article.text:
@@ -93,6 +98,7 @@ class RumbleProcessor:
             video_entry["platform"] = self.PLATFORM
             video_entry["createdAt"] = time_in_seconds
             video_entry["channelUrl"] = f"{self.RUMBLE_BASE}{channel_id}"
+            video_entry["isLive"] = is_live
             video_entries.append(video_entry)
         return video_entries, channel_meta
 
@@ -141,10 +147,16 @@ class RumbleProcessor:
                 views_count = info_text.split(" ")[0].replace(",", "")
 
         # description
-        media_description_class = soup.find(
+        media_description_text = soup.find(
             "div", "container content media-description").text.strip()
-        video_description = media_description_class.split(" — ")[1]
-
+        
+        # "Rumble — " if no description
+        if media_description_text == "Rumble\n —":
+            video_description = None
+        else:
+            video_description = media_description_text.split(" — ")[1]
+        
+    
         # like count (rumbles count)
         count = int(soup.find("span", "rumbles-count").text.strip())
 

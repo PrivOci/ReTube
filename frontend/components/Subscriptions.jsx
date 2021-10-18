@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import videoBoxes from "./SmallVideoBox";
 import { fetchData } from "../utils";
 import { snapshot } from "valtio";
 import VideoBoard from "./VideoBoard";

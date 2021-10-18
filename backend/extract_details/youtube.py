@@ -1,8 +1,8 @@
 from datetime import datetime
 
 import dateparser
+import pytube
 import requests
-from pytube import YouTube
 from youtubesearchpython import VideosSearch, ChannelsSearch
 from yt_dlp.utils import DownloadError
 from loguru import logger
@@ -13,14 +13,8 @@ from utils.util import parsed_time_to_seconds, convert_str_to_number, is_connect
 class YoutubeProcessor:
     """Class to process YouTube videos and channels."""
     YOUTUBE = "yt"
-    ydl_opts = {
-        'format': 'best',
-        # force to use ipv4
-        'source_address': '0.0.0.0',
-    }
 
     def __init__(self) -> None:
-        self.ydl = yt.YoutubeDL(self.ydl_opts)
         self.session = requests.Session()
 
     def get_video_details(self, video_url) -> dict:
@@ -31,13 +25,27 @@ class YoutubeProcessor:
         Extract video meta using pytube
         """
 
-        yt_object = YouTube(video_url)
-        video_url_obj = yt_object.streams.filter(
-            progressive=True, file_extension='mp4').order_by("resolution").desc().first()
+        # TODO: cache data until video url expires
+        yt_object = pytube.YouTube(video_url)
+
+        is_live = False
+        try:
+            yt_object.check_availability()
+        except pytube.exceptions.LiveStreamError as e:
+            is_live = True
+
+        if is_live:
+            # TODO: live stream url
+            video_url = None
+        else:
+            video_url_obj = yt_object.streams.filter(
+                progressive=True, file_extension='mp4').order_by("resolution").desc().first()
+            video_url = video_url_obj.url
+
         video_details = {
             "id": yt_object.video_id,
             "title": yt_object.title,
-            "streamUrl": video_url_obj.url,
+            "streamUrl": video_url,
             "description": yt_object.description,
             "author": yt_object.author,
             "duration": yt_object.length,
@@ -233,8 +241,11 @@ class YoutubeProcessor:
                 video_entry["views"] = int(views_str.replace(',', ''))
             video_entry["videoUrl"] = f"https://www.youtube.com/watch?v={video_meta['videoId']}"
             # 16:33
-            duration_str = video_meta["lengthText"]["runs"][0]["text"]
-            video_entry["duration"] = parsed_time_to_seconds(duration_str)
+            if "lengthText" in video_meta:
+                duration_str = video_meta["lengthText"]["runs"][0]["text"]
+                video_entry["duration"] = parsed_time_to_seconds(duration_str)
+            else:
+                video_entry["duration"] = None
 
             video_entry["channelUrl"] = channel_url
             video_entry["author"] = channel_name
