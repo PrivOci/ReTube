@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import videoBoxes from "./SmallVideoBox";
-import { fetchVideos } from "../utils";
+import { fetchData } from "../utils";
 import { snapshot } from "valtio";
 import VideoBoard from "./VideoBoard";
 
@@ -24,23 +24,23 @@ const fetchSubsVideos = async (subsStore, setVideoDataState) => {
   // youtube
   subsStore.youtube.forEach((item, index) => {
     const ytUrl = `https://www.youtube.com/channel/${item}`;
-    allSubsWait.push(fetchVideos(ytUrl));
+    allSubsWait.push(fetchData(ytUrl));
   });
   // Lbry
   subsStore.lbry.forEach((item, index) => {
     const lbUrl = `https://odysee.com/@${item}`;
-    allSubsWait.push(fetchVideos(lbUrl));
+    allSubsWait.push(fetchData(lbUrl));
   });
   // bitchute
   subsStore.bitchute.forEach((item, index) => {
     const bcUrl = `https://www.bitchute.com/channel/${item}`;
-    allSubsWait.push(fetchVideos(bcUrl));
+    allSubsWait.push(fetchData(bcUrl));
   });
   // rumble
   if ("rumble" in subsStore) {
     subsStore.rumble.forEach((item, index) => {
       const rbUrl = `https://rumble.com/${item}`;
-      allSubsWait.push(fetchVideos(rbUrl));
+      allSubsWait.push(fetchData(rbUrl));
     });
   }
 

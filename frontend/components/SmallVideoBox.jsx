@@ -39,7 +39,7 @@ const VideoThumbnail = ({ item }) => {
             loading="lazy"
           />
           <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute left-2 bottom-2 bg-opacity-50">
-            {`${timeSince(item.createdAt)} ago`}
+            {item.createdAt ? `${timeSince(item.createdAt)} ago` : ""}
           </span>
           <span className="px-2 py-1 text-white bg-gray-700 text-xs rounded absolute right-2 bottom-2 bg-opacity-50">
             {humanizeDurationSec(item.duration)}
@@ -81,7 +81,10 @@ const ChannelThumbnail = ({ item }) => {
           {platform}
         </p>
       </a>
-      <SubscribeButton channel_url={item.channelUrl} count={item.subscriberCount} />
+      <SubscribeButton
+        channel_url={item.channelUrl}
+        count={item.subscriberCount}
+      />
       <a href={`channel?url=${item.channelUrl}`} alt="video source">
         <p className="text-sm py-1 text-black dark:text-white">{item.title}</p>
       </a>

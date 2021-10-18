@@ -53,6 +53,7 @@ class YoutubeProcessor:
 
         results_json = VideosSearch(search_words, limit=max_results)
         data_dict = {"platform": self.YOUTUBE}
+
         video_entries = []
         for video in results_json.result()["result"]:
             video_entry = {}
@@ -62,7 +63,16 @@ class YoutubeProcessor:
             video_entry["author"] = video["channel"]["name"]
             video_entry["channelUrl"] = video["channel"]["link"]
             video_entry["views"] = ""  # TODO: video["viewCount"]["text"]
-            video_entry["createdAt"] = ""  # TODO: video["publishedTime"]
+            # date
+            video_time = video["publishedTime"]
+            if video_time:
+                # None if still streaming
+                if "Streamed" in video_time:
+                    video_time = video_time.split("Streamed ")[1]
+                date_formatted = dateparser.parse(video_time)
+                video_entry["createdAt"] = date_formatted.timestamp() * 1000
+            # duration
+            video_entry["duration"] = parsed_time_to_seconds(video["duration"])
             video_entry["videoUrl"] = video["link"]
             video_entry["platform"] = self.YOUTUBE
             video_entries.append(video_entry)
@@ -154,6 +164,22 @@ class YoutubeProcessor:
             data_dict["ready"] = False
             return data_dict
         resp_json = response.json()
+        
+        # header
+        if not is_it_playlist:
+            header = resp_json["response"]["header"]["c4TabbedHeaderRenderer"]
+            subscriber_count = None
+            if "subscriberCountText" in header:
+                sub_count_str = header["subscriberCountText"]["runs"][0]["text"].split(" ")[0]
+                subscriber_count = convert_str_to_number(sub_count_str)
+            
+            data_dict["channel_meta"] = {
+                "title": header["title"],
+                "channelUrl": f"https://youtube.com/channel/{header['channelId']}",
+                "banner": header["banner"]["thumbnails"][0]["url"] if "banner" in header else None,
+                "avatar": header["avatar"]["thumbnails"][0]["url"],
+                "subscriberCount": subscriber_count
+            }
 
         # tab 1 - is for videos
         videos_index = 0 if is_it_playlist else 1
@@ -199,6 +225,9 @@ class YoutubeProcessor:
                 # 2,403 views
                 views_str = video_meta["viewCountText"]["runs"][0]["text"].split(" ")[
                     0]
+                # No views
+                if views_str == "No": 
+                    views_str = "0"
                 video_entry["views"] = int(views_str.replace(',', ''))
             video_entry["videoUrl"] = f"https://www.youtube.com/watch?v={video_meta['videoId']}"
             # 16:33

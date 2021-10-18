@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { fetchVideos } from "../utils";
+import { fetchData } from "../utils";
 import VideoBoard from "../components/VideoBoard";
 export default function popular() {
   let [videoData, setVideoDataState] = useState();
 
   const fetchPopularVideos = async (setVideoDataState) => {
     console.log("fetching popular videos");
-    const ytPromise = fetchVideos("yt_popular");
-    const lbPromise = fetchVideos("lbry_popular");
-    const bcPromise = fetchVideos("bitchute_popular");
-    const rbPromise = fetchVideos("rb_popular");
+    const ytPromise = fetchData("yt_popular");
+    const lbPromise = fetchData("lbry_popular");
+    const bcPromise = fetchData("bitchute_popular");
+    const rbPromise = fetchData("rb_popular");
 
     let allPopular = {};
     allPopular.platform = "all";

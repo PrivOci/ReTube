@@ -112,7 +112,7 @@ export const fetchDataSWR = async (url, search) => {
   } else if (search) {
     return fetchSearchResults(decodeURI(search));
   } else {
-    return fetchVideos(url);
+    return fetchData(url);
   }
 };
 
@@ -179,7 +179,7 @@ export const fetchJson = async (target_url, requestOptions) => {
   return data;
 };
 
-export const fetchVideos = async (url) => {
+export const fetchData = async (url) => {
   let [platform, id, api_url] = channelUrlDetails(url);
 
   const requestOptions = {
@@ -202,9 +202,9 @@ export const fetchVideos = async (url) => {
 
 export const fetchPopularVideos = async () => {
   console.log("fetchPopularVideos");
-  const ytPromise = fetchVideos("yt_popular");
-  const lbPromise = fetchVideos("lbry_popular");
-  const bcPromise = fetchVideos("bitchute_popular");
+  const ytPromise = fetchData("yt_popular");
+  const lbPromise = fetchData("lbry_popular");
+  const bcPromise = fetchData("bitchute_popular");
 
   let allPopular = {};
   allPopular.platform = "all";
