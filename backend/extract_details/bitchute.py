@@ -148,12 +148,22 @@ class BitchuteProcessor:
             "ready": False,
             "platform": self.BITCHUTE
         }
-        popular_rss_url = f"{self.BITCHUTE_XML}{details['id']}"
-        content = get_xml_stream_as_json(popular_rss_url, session=self.session)
+        channel_rss = f"{self.BITCHUTE_XML}{details['id']}"
+        content = get_xml_stream_as_json(channel_rss, session=self.session)
         if not content:
             return data_dict
+
+        channel_json = content["rss"]["channel"]
+        data_dict["channel_meta"] = {
+            "title": channel_json["title"],
+            "channelUrl": channel_json["link"],
+            "banner": None,
+            "avatar": None,
+            "subscriberCount": None,
+        }
+
         video_entries = []
-        for entry in content["rss"]["channel"]["item"]:
+        for entry in channel_json["item"]:
             video_entry = {
                 "thumbnailUrl": entry["enclosure"]["@url"],
                 "title": entry["title"],

@@ -22,11 +22,16 @@ const ChannelHeader = ({ data }) => {
         <div className="container mx-auto">
           <div className="flex justify-between items-center py-4 px-16">
             <div className="flex items-center">
-              <img
-                className="w-24 h-24 rounded-full"
-                src={data.channel_meta.avatar}
-                alt="channel_logo"
-              ></img>
+              {/* show number of avatar if its is available */}
+              {data.channel_meta.avatar ? (
+                <img
+                  className="w-24 h-24 rounded-full"
+                  src={data.channel_meta.avatar}
+                  alt="channel_logo"
+                ></img>
+              ) : (
+                ""
+              )}
               <div className="ml-6">
                 <div className="text-2xl font-normal flex items-center">
                   <span className="mr-2 text-black dark:text-white">
