@@ -1,10 +1,7 @@
-from datetime import datetime
-
 import dateparser
 import pytube
 import requests
 from youtubesearchpython import VideosSearch, ChannelsSearch
-from yt_dlp.utils import DownloadError
 from loguru import logger
 
 from utils.util import parsed_time_to_seconds, convert_str_to_number, is_connected
