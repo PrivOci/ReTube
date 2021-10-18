@@ -9,6 +9,7 @@ import dateutil.parser as dp
 
 # TODO: search for channels
 
+
 class RumbleProcessor:
     """Class to process Rumble videos and channels."""
     PLATFORM = "rb"
@@ -17,7 +18,7 @@ class RumbleProcessor:
     def __init__(self) -> None:
         self.session = requests.Session()
 
-    def _get_video_entries(self, target_url) -> list:
+    def _get_video_entries(self, target_url, parse_channel_meta=False) -> list:
         res = self.session.get(target_url)
         if not res.ok:
             logger.debug(
@@ -27,6 +28,30 @@ class RumbleProcessor:
         constrained_section = soup.find("div", "constrained")
         list_html = constrained_section.find("ol")
         video_list_html = list_html.find_all("li", "video-listing-entry")
+
+        # channel meta
+        channel_meta = None
+        if parse_channel_meta and not "rumble.com/videos" in target_url:
+            title = constrained_section.find(
+                "h1", {"class": "listing-header--title"}).text
+            banner = constrained_section.find(
+                "img", {"class": "listing-header--backsplash-img"})["src"]
+            avatar = constrained_section.find(
+                "img", {"class": "listing-header--thumb"})["src"]
+            # subscriber count
+            subscriber_count = None
+            subs_count_span = soup.find(
+                "span", "subscribe-button-count")
+            if subs_count_span:
+                subs_count_str = subs_count_span.text.strip()
+                subscriber_count = convert_str_to_number(subs_count_str)
+            channel_meta = {
+                "title": title,
+                "channelUrl": target_url,
+                "banner": banner,
+                "avatar": avatar,
+                "subscriberCount": subscriber_count
+            }
 
         video_entries = []
         for block in video_list_html:
@@ -64,7 +89,7 @@ class RumbleProcessor:
             video_entry["createdAt"] = time_in_seconds
             video_entry["channelUrl"] = f"{self.RUMBLE_BASE}{channel_id}"
             video_entries.append(video_entry)
-        return video_entries
+        return video_entries, channel_meta
 
     def channel_data(self, details: dict) -> dict:
         data_dict = {
@@ -78,7 +103,8 @@ class RumbleProcessor:
         if not details["id"]:
             return {}
         data_dict["ready"] = True
-        data_dict["content"] = self._get_video_entries(channel_url)
+        data_dict["content"], data_dict["channel_meta"] = self._get_video_entries(
+            channel_url, parse_channel_meta=True)
         return data_dict
 
     def search_for_videos(self, search_query) -> dict:
@@ -93,7 +119,7 @@ class RumbleProcessor:
 
         videos_url = f"{self.RUMBLE_BASE}/search/video?q={encoded_query}"
         data_dict["ready"] = True
-        data_dict["content"] = self._get_video_entries(videos_url)
+        data_dict["content"], _ = self._get_video_entries(videos_url)
         return data_dict
 
     def get_video_details(self, video_url) -> dict:
